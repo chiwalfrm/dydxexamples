@@ -1,7 +1,10 @@
-import sys
+import datetime
 import json
-from websocket import create_connection
+import pprint
+import sys
+import time
 from os.path import exists
+from websocket import create_connection
 
 def checkaskfiles():
         if exists('/mnt/ramdisk/asks/'+askprice) == True:
@@ -13,8 +16,8 @@ def checkaskfiles():
                 fp.close()
         if exists('/mnt/ramdisk/asks/'+askprice) == False or askoffset > faskoffset:
                 with open('/mnt/ramdisk/asks/'+askprice, "w") as fp:
-                        fp.write(askoffset+' '+asksize+'\n')
-                print('Updated /mnt/ramdisk/asks/'+askprice+': ', askoffset, asksize)
+                        fp.write(askoffset+' '+asksize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated /mnt/ramdisk/asks/'+askprice+':', str('('+asksize+')').ljust(10), askoffset)
                 fp.close()
 
 def checkbidfiles():
@@ -27,18 +30,19 @@ def checkbidfiles():
                 fp.close()
         if exists('/mnt/ramdisk/bids/'+bidprice) == False or bidoffset > fbidoffset:
                 with open('/mnt/ramdisk/bids/'+bidprice, "w") as fp:
-                        fp.write(bidoffset+' '+bidsize+'\n')
-                print('Updated /mnt/ramdisk/bids/'+bidprice+': ', bidoffset, bidsize)
+                        fp.write(bidoffset+' '+bidsize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated /mnt/ramdisk/bids/'+bidprice+':', str('('+bidsize+')').ljust(10), bidoffset)
                 fp.close()
 
 
+pp = pprint.PrettyPrinter(width = 41, compact = True)
 sep = " "
 ws = create_connection("wss://api.dydx.exchange/v3/ws")
 api_data = {"type":"subscribe", "channel":"v3_orderbook", "id":"BTC-USD", "includeOffsets":True}
 ws.send(json.dumps(api_data))
 api_data = ws.recv()
 api_data = json.loads(api_data)
-print(api_data)
+pp.pprint(api_data)
 api_data = ws.recv()
 api_data = json.loads(api_data)
 asks = api_data['contents']['asks']
@@ -73,3 +77,7 @@ while True:
         except KeyboardInterrupt:
                 ws.close()
                 sys.exit(0)
+        except Exception as error:
+                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+" WebSocket message failed (%s)" % error)
+                ws.close()
+                time.sleep(1)
