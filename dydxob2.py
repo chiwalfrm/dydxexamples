@@ -5,7 +5,7 @@ import time
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-REDWHITE='\033[0;31mi\u001b[47m'
+REDWHITE='\033[0;31m\u001b[47m'
 GREENWHITE='\033[0;32m\u001b[47m'
 YELLOW='\033[0;33m'
 CYAN='\033[0;36m'
