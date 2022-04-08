@@ -1,9 +1,12 @@
 import datetime
 import os
+import sys
 import time
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
+REDWHITE='\033[0;31mi\u001b[47m'
+GREENWHITE='\033[0;32m\u001b[47m'
 YELLOW='\033[0;33m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
@@ -108,7 +111,10 @@ while True:
                                                 fp2.close()
                 fp.close()
         count = 0
-        print('Bid                                              | Ask')
+        if len(sys.argv) > 1 and sys.argv[1] == 'compact':
+                print('Bid                                   | Ask')
+        else:
+                print('Bid                                              | Ask')
         while count < 10:
                 biditem = bidarray[count]
                 biditemprice = biditem[0]
@@ -122,10 +128,13 @@ while True:
                 askitemoffset = askitem[2]
                 askitemdate = askitem[3]
                 askitemtime = askitem[4]
+                if len(sys.argv) > 1 and sys.argv[1] == 'compact':
+                        biditemoffset=''
+                        askitemoffset=''
                 if biditemprice == fprice:
-                        print(GREEN+biditemprice+NC, str('('+biditemsize+')').ljust(10), biditemoffset, biditemdate, biditemtime+' | '+askitemprice, str('('+askitemsize+')').ljust(10), askitemoffset, askitemdate, askitemtime)
+                        print(REDWHITE+biditemprice+NC, str('('+biditemsize+')').ljust(10), biditemoffset, biditemdate, biditemtime+' | '+askitemprice, str('('+askitemsize+')').ljust(10), askitemoffset, askitemdate, askitemtime)
                 elif askitemprice == fprice:
-                        print(biditemprice, str('('+biditemsize+')').ljust(10), biditemoffset, biditemdate, biditemtime+' | '+RED+askitemprice+NC, str('('+askitemsize+')').ljust(10), askitemoffset, askitemdate, askitemtime)
+                        print(biditemprice, str('('+biditemsize+')').ljust(10), biditemoffset, biditemdate, biditemtime+' | '+GREENWHITE+askitemprice+NC, str('('+askitemsize+')').ljust(10), askitemoffset, askitemdate, askitemtime)
                 else:
                         print(biditemprice, str('('+biditemsize+')').ljust(10), biditemoffset, biditemdate, biditemtime+' | '+askitemprice, str('('+askitemsize+')').ljust(10), askitemoffset, askitemdate, askitemtime)
                 count += 1
