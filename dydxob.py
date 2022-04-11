@@ -1,44 +1,66 @@
 import datetime
 import json
+import logging
+import os
 import pprint
 import sys
 import time
+from logging.handlers import RotatingFileHandler
 from os.path import exists
 from websocket import create_connection
 
+ramdiskpath = '/mnt/ramdisk'
+logger = logging.getLogger("Rotating Log")
+logger.setLevel(logging.INFO)
+
 def checkaskfiles():
-        if exists('/mnt/ramdisk/asks/'+askprice) == True:
-                with open('/mnt/ramdisk/asks/'+askprice) as fp:
+        if exists(ramdiskpath+'/'+market+'/asks/'+askprice) == True:
+                with open(ramdiskpath+'/'+market+'/asks/'+askprice) as fp:
                         for line in fp:
                                 fname = line.strip('\n\r').split(sep)
                                 faskoffset = fname[0]
                                 fasksize = fname[1]
                 fp.close()
-        if exists('/mnt/ramdisk/asks/'+askprice) == False or askoffset > faskoffset:
-                with open('/mnt/ramdisk/asks/'+askprice, "w") as fp:
+        if exists(ramdiskpath+'/'+market+'/asks/'+askprice) == False or askoffset > faskoffset:
+                with open(ramdiskpath+'/'+market+'/asks/'+askprice, "w") as fp:
                         fp.write(askoffset+' '+asksize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
-                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated /mnt/ramdisk/asks/'+askprice+':', str('('+asksize+')').ljust(10), askoffset)
+                logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/asks/'+askprice+': '+str('('+asksize+')').ljust(10)+' '+askoffset)
                 fp.close()
 
 def checkbidfiles():
-        if exists('/mnt/ramdisk/bids/'+bidprice) == True:
-                with open('/mnt/ramdisk/bids/'+bidprice) as fp:
+        if exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == True:
+                with open(ramdiskpath+'/'+market+'/bids/'+bidprice) as fp:
                         for line in fp:
                                 fname = line.strip('\n\r').split(sep)
                                 fbidoffset = fname[0]
                                 fbidsize = fname[1]
                 fp.close()
-        if exists('/mnt/ramdisk/bids/'+bidprice) == False or bidoffset > fbidoffset:
-                with open('/mnt/ramdisk/bids/'+bidprice, "w") as fp:
+        if exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == False or bidoffset > fbidoffset:
+                with open(ramdiskpath+'/'+market+'/bids/'+bidprice, "w") as fp:
                         fp.write(bidoffset+' '+bidsize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
-                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated /mnt/ramdisk/bids/'+bidprice+':', str('('+bidsize+')').ljust(10), bidoffset)
+                logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/bids/'+bidprice+': '+str('('+bidsize+')').ljust(10)+' '+bidoffset)
                 fp.close()
-
 
 pp = pprint.PrettyPrinter(width = 41, compact = True)
 sep = " "
+if len(sys.argv) < 2:
+        market = 'BTC-USD'
+else:
+        market = sys.argv[1]
+handler = RotatingFileHandler(ramdiskpath+'/dydxob'+market+'.log', maxBytes=1048576,
+                              backupCount=4)
+logger.addHandler(handler)
+if exists(ramdiskpath) == False:
+        print('Error: Ramdisk', ramdiskpath, 'not mounted')
+        exit()
+if os.path.ismount(ramdiskpath) == False:
+        print('Warning:', ramdiskpath, 'is not a mount point')
+if exists(ramdiskpath+'/'+market+'/asks') == False:
+        os.system('mkdir -p '+ramdiskpath+'/'+market+'/asks')
+if exists(ramdiskpath+'/'+market+'/bids') == False:
+        os.system('mkdir -p '+ramdiskpath+'/'+market+'/bids')
 ws = create_connection("wss://api.dydx.exchange/v3/ws")
-api_data = {"type":"subscribe", "channel":"v3_orderbook", "id":"BTC-USD", "includeOffsets":True}
+api_data = {"type":"subscribe", "channel":"v3_orderbook", "id":market, "includeOffsets":True}
 ws.send(json.dumps(api_data))
 api_data = ws.recv()
 api_data = json.loads(api_data)
@@ -78,6 +100,6 @@ while True:
                 ws.close()
                 sys.exit(0)
         except Exception as error:
-                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+" WebSocket message failed (%s)" % error)
+                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
                 ws.close()
                 time.sleep(1)
