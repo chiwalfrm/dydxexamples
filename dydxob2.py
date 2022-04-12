@@ -3,17 +3,23 @@ import os
 import sys
 import time
 from os.path import exists
+from sys import platform
 
-ramdiskpath = '/mnt/ramdisk'
+if platform == "linux" or platform == "linux2":
+        # linux
+        ramdiskpath = '/mnt/ramdisk'
+elif platform == "darwin":
+        # OS X
+        ramdiskpath = '/Volumes/RAMDisk'
 #Note: regular output needs 103 columns, compact 67, ultracompact 39
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-REDWHITE='\033[0;31m\u001b[47m'
-GREENWHITE='\033[0;32m\u001b[47m'
-YELLOW='\033[0;33m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+RED = '\033[0;31m'
+GREEN = '\033[0;32m'
+YELLOW = '\033[0;33m'
+CYAN = '\033[0;36m'
+NC = '\033[0m' # No Color
+REDWHITE = '\033[0;31m\u001b[47m'
+GREENWHITE = '\033[0;32m\u001b[47m'
 
 sep = " "
 if len(sys.argv) < 2:
@@ -44,16 +50,33 @@ while True:
         fp.close()
         askarray = []
         bidarray = []
+        os.system('ls '+ramdiskpath+'/'+market+'/asks | sort -n > '+ramdiskpath+'/'+market+'/lista')
+        os.system('ls '+ramdiskpath+'/'+market+'/bids | sort -n -r > '+ramdiskpath+'/'+market+'/listb')
         if fside == 'BUY':
-                os.system('ls '+ramdiskpath+'/'+market+'/asks | sort -n > '+ramdiskpath+'/'+market+'/list')
+                with open(ramdiskpath+'/'+market+'/lista') as fp:
+                        for line in fp:
+                                line = line.strip('\n\r')
+                                if float(line) >= float(fprice):
+                                        lowestask = float(line)
+                                        break
+                fp.close()
+                with open(ramdiskpath+'/'+market+'/listb') as fp:
+                        for line in fp:
+                                line = line.strip('\n\r')
+                                if float(line) < float(fprice):
+                                        highestbid = float(line)
+                                        break
+                fp.close()
                 count = 1
-                with open(ramdiskpath+'/'+market+'/list') as fp:
+                with open(ramdiskpath+'/'+market+'/lista') as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if count > depth:
                                         break
                                 else:
-                                        if float(line) >= float(fprice):
+                                        if float(line) > highestbid:
+                                                if count == 1:
+                                                        lowestask = float(line)
                                                 with open(ramdiskpath+'/'+market+'/asks/'+line) as fp2:
                                                         for line2 in fp2:
                                                                 fname = line2.strip('\n\r').split(sep)
@@ -66,15 +89,16 @@ while True:
                                                                         count += 1
                                                 fp2.close()
                 fp.close()
-                os.system('ls '+ramdiskpath+'/'+market+'/bids | sort -n -r > '+ramdiskpath+'/'+market+'/list')
                 count = 1
-                with open(ramdiskpath+'/'+market+'/list') as fp:
+                with open(ramdiskpath+'/'+market+'/listb') as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if count > depth:
                                         break
                                 else:
-                                        if float(line) < float(fprice):
+                                        if float(line) <= lowestask:
+                                                if count == 1:
+                                                        highestbid = float(line)
                                                 with open(ramdiskpath+'/'+market+'/bids/'+line) as fp2:
                                                         for line2 in fp2:
                                                                 fname = line2.strip('\n\r').split(sep)
@@ -88,15 +112,30 @@ while True:
                                                 fp2.close()
                 fp.close()
         else:
-                os.system('ls '+ramdiskpath+'/'+market+'/asks | sort -n > '+ramdiskpath+'/'+market+'/list')
+                with open(ramdiskpath+'/'+market+'/lista') as fp:
+                        for line in fp:
+                                line = line.strip('\n\r')
+                                if float(line) > float(fprice):
+                                        lowestask = float(line)
+                                        break
+                fp.close()
+                with open(ramdiskpath+'/'+market+'/listb') as fp:
+                        for line in fp:
+                                line = line.strip('\n\r')
+                                if float(line) <= float(fprice):
+                                        highestbid = float(line)
+                                        break
+                fp.close()
                 count = 1
-                with open(ramdiskpath+'/'+market+'/list') as fp:
+                with open(ramdiskpath+'/'+market+'/lista') as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if count > depth:
                                         break
                                 else:
-                                        if float(line) > float(fprice):
+                                        if float(line) >= highestbid:
+                                                if count == 1:
+                                                        lowestask = float(line)
                                                 with open(ramdiskpath+'/'+market+'/asks/'+line) as fp2:
                                                         for line2 in fp2:
                                                                 fname = line2.strip('\n\r').split(sep)
@@ -109,15 +148,16 @@ while True:
                                                                         count += 1
                                                 fp2.close()
                 fp.close()
-                os.system('ls '+ramdiskpath+'/'+market+'/bids | sort -n -r > '+ramdiskpath+'/'+market+'/list')
                 count = 1
-                with open(ramdiskpath+'/'+market+'/list') as fp:
+                with open(ramdiskpath+'/'+market+'/listb') as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if count > depth:
                                         break
                                 else:
-                                        if float(line) <= float(fprice):
+                                        if float(line) < lowestask:
+                                                if count == 1:
+                                                        highestbid = float(line)
                                                 with open(ramdiskpath+'/'+market+'/bids/'+line) as fp2:
                                                         for line2 in fp2:
                                                                 fname = line2.strip('\n\r').split(sep)
@@ -138,7 +178,7 @@ while True:
                         print(fcreatedat[5:], fprice, fside, fsize)
                         print('Bid                | Ask')
         else:
-                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Last trade: ', fcreatedat, fprice, fside, fsize)
+                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Last trade:', fcreatedat, fprice, fside, fsize)
                 print('Bid                                                | Ask')
         count = 0
         highestoffset = 0
@@ -166,20 +206,20 @@ while True:
                         lowestoffset = min(int(biditemoffset), int(askitemoffset), lowestoffset)
                 if len(sys.argv) > 3 and ( sys.argv[3] == 'compact' or sys.argv[3] == 'ultracompact' ):
                         if sys.argv[3] == 'compact':
-                                biditemoffset=''
-                                askitemoffset=''
+                                biditemoffset = ''
+                                askitemoffset = ''
                                 biditemdate = biditemdate[6:]
                                 askitemdate = askitemdate[6:]
                         elif sys.argv[3] == 'ultracompact':
-                                biditemoffset=''
-                                askitemoffset=''
+                                biditemoffset = ''
+                                askitemoffset = ''
                                 biditemdate = ''
                                 askitemdate = ''
                                 biditemtime = ''
                                 askitemtime = ''
                 else:
-                        biditemoffset=' '+biditemoffset
-                        askitemoffset=' '+askitemoffset
+                        biditemoffset = ' '+biditemoffset
+                        askitemoffset = ' '+askitemoffset
                 print(biditemprice.ljust(7), str('('+biditemsize+')').ljust(10)+biditemoffset+biditemdate+biditemtime+' | '+askitemprice.ljust(7), str('('+askitemsize+')').ljust(10)+askitemoffset+askitemdate+askitemtime, end = '\r')
                 if sys.argv[-1] != 'noansi':
                         if biditemprice == fprice:
@@ -188,6 +228,8 @@ while True:
                                 print(biditemprice.ljust(7), str('('+biditemsize+')').ljust(10)+biditemoffset+biditemdate+biditemtime+' | '+GREENWHITE+askitemprice+NC, end = '\r')
                 print()
                 count += 1
+        print('highgestbid:', highestbid)
+        print('lowestask:', lowestask)
         print('bidvolume:', bidsizetotal)
         print('askvolume:', asksizetotal)
         print('minoffset:', lowestoffset)
