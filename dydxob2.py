@@ -1,5 +1,6 @@
 import datetime
 import os
+import signal
 import sys
 import time
 from os.path import exists
@@ -21,6 +22,14 @@ NC = '\033[0m' # No Color
 REDWHITE = '\033[0;31m\u001b[47m'
 GREENWHITE = '\033[0;32m\u001b[47m'
 
+def handler(signum, frame):
+        os.system('rm '+ramdiskpath+'/'+market+'/lista'+str(pid))
+        os.system('rm '+ramdiskpath+'/'+market+'/listb'+str(pid))
+        exit()
+
+signal.signal(signal.SIGINT, handler)
+
+pid = os.getpid()
 sep = " "
 if len(sys.argv) < 2:
         market = 'BTC-USD'
@@ -50,17 +59,17 @@ while True:
         fp.close()
         askarray = []
         bidarray = []
-        os.system('ls '+ramdiskpath+'/'+market+'/asks | sort -n > '+ramdiskpath+'/'+market+'/lista')
-        os.system('ls '+ramdiskpath+'/'+market+'/bids | sort -n -r > '+ramdiskpath+'/'+market+'/listb')
+        os.system('ls '+ramdiskpath+'/'+market+'/asks | sort -n > '+ramdiskpath+'/'+market+'/lista'+str(pid))
+        os.system('ls '+ramdiskpath+'/'+market+'/bids | sort -n -r > '+ramdiskpath+'/'+market+'/listb'+str(pid))
         if fside == 'BUY':
-                with open(ramdiskpath+'/'+market+'/lista') as fp:
+                with open(ramdiskpath+'/'+market+'/lista'+str(pid)) as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if float(line) >= float(fprice):
                                         lowestask = float(line)
                                         break
                 fp.close()
-                with open(ramdiskpath+'/'+market+'/listb') as fp:
+                with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if float(line) < float(fprice):
@@ -68,7 +77,7 @@ while True:
                                         break
                 fp.close()
                 count = 1
-                with open(ramdiskpath+'/'+market+'/lista') as fp:
+                with open(ramdiskpath+'/'+market+'/lista'+str(pid)) as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if count > depth:
@@ -88,7 +97,7 @@ while True:
                                                 fp2.close()
                 fp.close()
                 count = 1
-                with open(ramdiskpath+'/'+market+'/listb') as fp:
+                with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if count > depth:
@@ -108,14 +117,14 @@ while True:
                                                 fp2.close()
                 fp.close()
         else:
-                with open(ramdiskpath+'/'+market+'/lista') as fp:
+                with open(ramdiskpath+'/'+market+'/lista'+str(pid)) as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if float(line) > float(fprice):
                                         lowestask = float(line)
                                         break
                 fp.close()
-                with open(ramdiskpath+'/'+market+'/listb') as fp:
+                with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if float(line) <= float(fprice):
@@ -123,7 +132,7 @@ while True:
                                         break
                 fp.close()
                 count = 1
-                with open(ramdiskpath+'/'+market+'/lista') as fp:
+                with open(ramdiskpath+'/'+market+'/lista'+str(pid)) as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if count > depth:
@@ -143,7 +152,7 @@ while True:
                                                 fp2.close()
                 fp.close()
                 count = 1
-                with open(ramdiskpath+'/'+market+'/listb') as fp:
+                with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
                         for line in fp:
                                 line = line.strip('\n\r')
                                 if count > depth:
