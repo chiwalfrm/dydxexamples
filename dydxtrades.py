@@ -7,9 +7,15 @@ import sys
 import time
 from logging.handlers import RotatingFileHandler
 from os.path import exists
+from sys import platform
 from websocket import create_connection
 
-ramdiskpath = '/mnt/ramdisk'
+if platform == "linux" or platform == "linux2":
+        # linux
+        ramdiskpath = '/mnt/ramdisk'
+elif platform == "darwin":
+        # OS X
+        ramdiskpath = '/Volumes/RAMDisk'
 logger = logging.getLogger("Rotating Log")
 logger.setLevel(logging.INFO)
 
@@ -19,7 +25,7 @@ if len(sys.argv) < 2:
 else:
         market = sys.argv[1]
 handler = RotatingFileHandler(ramdiskpath+'/dydxtrades'+market+'.log', maxBytes=1048576,
-                              backupCount=4)
+                              backupCount = 4)
 logger.addHandler(handler)
 if exists(ramdiskpath) == False:
         print('Error: Ramdisk', ramdiskpath, 'not mounted')
