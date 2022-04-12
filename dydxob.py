@@ -10,16 +10,6 @@ from os.path import exists
 from sys import platform
 from websocket import create_connection
 
-if platform == "linux" or platform == "linux2":
-        # linux
-        ramdiskpath = '/mnt/ramdisk'
-elif platform == "darwin":
-        # OS X
-        ramdiskpath = '/Volumes/RAMDisk'
-
-logger = logging.getLogger("Rotating Log")
-logger.setLevel(logging.INFO)
-
 def checkaskfiles():
         if exists(ramdiskpath+'/'+market+'/asks/'+askprice) == True:
                 with open(ramdiskpath+'/'+market+'/asks/'+askprice) as fp:
@@ -48,8 +38,46 @@ def checkbidfiles():
                 logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/bids/'+bidprice+': '+str('('+bidsize+')').ljust(10)+' '+bidoffset)
                 fp.close()
 
+def openconnection():
+        global ws
+        global askprice
+        global askoffset
+        global asksize
+        global bidprice
+        global bidoffset
+        global bidsize
+        ws = create_connection("wss://api.dydx.exchange/v3/ws")
+        api_data = {"type":"subscribe", "channel":"v3_orderbook", "id":market, "includeOffsets":True}
+        ws.send(json.dumps(api_data))
+        api_data = ws.recv()
+        api_data = json.loads(api_data)
+        pp.pprint(api_data)
+        api_data = ws.recv()
+        api_data = json.loads(api_data)
+        asks = api_data['contents']['asks']
+        bids = api_data['contents']['bids']
+        for askitem in asks:
+                askprice = askitem['price']
+                askoffset = askitem['offset']
+                asksize = askitem['size']
+                checkaskfiles()
+        for biditem in bids:
+                bidprice = biditem['price']
+                bidoffset = biditem['offset']
+                bidsize = biditem['size']
+                checkbidfiles()
+
+logger = logging.getLogger("Rotating Log")
+logger.setLevel(logging.INFO)
 pp = pprint.PrettyPrinter(width = 41, compact = True)
+if platform == "linux" or platform == "linux2":
+        # linux
+        ramdiskpath = '/mnt/ramdisk'
+elif platform == "darwin":
+        # OS X
+        ramdiskpath = '/Volumes/RAMDisk'
 sep = " "
+
 if len(sys.argv) < 2:
         market = 'BTC-USD'
 else:
@@ -57,6 +85,7 @@ else:
 handler = RotatingFileHandler(ramdiskpath+'/dydxob'+market+'.log', maxBytes=1048576,
                               backupCount = 4)
 logger.addHandler(handler)
+
 if exists(ramdiskpath) == False:
         print('Error: Ramdisk', ramdiskpath, 'not mounted')
         exit()
@@ -66,26 +95,8 @@ if exists(ramdiskpath+'/'+market+'/asks') == False:
         os.system('mkdir -p '+ramdiskpath+'/'+market+'/asks')
 if exists(ramdiskpath+'/'+market+'/bids') == False:
         os.system('mkdir -p '+ramdiskpath+'/'+market+'/bids')
-ws = create_connection("wss://api.dydx.exchange/v3/ws")
-api_data = {"type":"subscribe", "channel":"v3_orderbook", "id":market, "includeOffsets":True}
-ws.send(json.dumps(api_data))
-api_data = ws.recv()
-api_data = json.loads(api_data)
-pp.pprint(api_data)
-api_data = ws.recv()
-api_data = json.loads(api_data)
-asks = api_data['contents']['asks']
-bids = api_data['contents']['bids']
-for askitem in asks:
-        askprice = askitem['price']
-        askoffset = askitem['offset']
-        asksize = askitem['size']
-        checkaskfiles()
-for biditem in bids:
-        bidprice = biditem['price']
-        bidoffset = biditem['offset']
-        bidsize = biditem['size']
-        checkbidfiles()
+
+openconnection()
 while True:
         try:
                 api_data = ws.recv()
@@ -110,3 +121,4 @@ while True:
                 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
                 ws.close()
                 time.sleep(1)
+                openconnection()
