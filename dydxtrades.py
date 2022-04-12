@@ -1,4 +1,3 @@
-vmware@ubuntu20041a:~/extra$ cat dydxtrades.py
 import datetime
 import json
 import logging
