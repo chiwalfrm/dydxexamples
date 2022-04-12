@@ -94,7 +94,7 @@ while True:
                                 if count > depth:
                                         break
                                 else:
-                                        if float(line) <= lowestask:
+                                        if float(line) < lowestask:
                                                 with open(ramdiskpath+'/'+market+'/bids/'+line) as fp2:
                                                         for line2 in fp2:
                                                                 fname = line2.strip('\n\r').split(sep)
@@ -129,7 +129,7 @@ while True:
                                 if count > depth:
                                         break
                                 else:
-                                        if float(line) >= highestbid:
+                                        if float(line) > highestbid:
                                                 with open(ramdiskpath+'/'+market+'/asks/'+line) as fp2:
                                                         for line2 in fp2:
                                                                 fname = line2.strip('\n\r').split(sep)
