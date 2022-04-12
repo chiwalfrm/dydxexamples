@@ -185,7 +185,7 @@ while True:
         highestoffset = 0
         bidsizetotal = 0
         asksizetotal = 0
-        while count < depth:
+        while count < min(depth, len(bidarray), len(askarray)):
                 biditem = bidarray[count]
                 biditemprice = biditem[0]
                 biditemsize = biditem[1]
@@ -229,10 +229,13 @@ while True:
                                 print(biditemprice.ljust(7), str('('+biditemsize+')').ljust(10)+biditemoffset+biditemdate+biditemtime+' | '+GREENWHITE+askitemprice+NC, end = '\r')
                 print()
                 count += 1
-        print('highestbid:', highestbid)
-        print('lowestask :', lowestask, '(+'+'{0:.4f}'.format(lowestask - highestbid)+')', '{0:.4f}'.format((lowestask - highestbid) / highestbid * 100)+'%')
-        print('bidvolume :', bidsizetotal)
-        print('askvolume :', asksizetotal)
-        print('minoffset :', lowestoffset)
-        print('maxoffset :', highestoffset, '(+'+str(highestoffset - lowestoffset)+')')
-        time.sleep(1)
+        print('maxbid   :', highestbid)
+        print('minask   :', lowestask, '(+'+'{0:.4f}'.format(lowestask - highestbid)+')', '{0:.4f}'.format((lowestask - highestbid) / highestbid * 100)+'%')
+        print('bidvolume:', bidsizetotal)
+        print('askvolume:', asksizetotal)
+        print('minoffset:', lowestoffset)
+        print('maxoffset:', highestoffset, '(+'+str(highestoffset - lowestoffset)+')')
+        if exists(ramdiskpath+'/'+market+'/EXITFLAG') == True:
+                exit()
+        else:
+                time.sleep(1)
