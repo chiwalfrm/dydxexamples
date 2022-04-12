@@ -75,8 +75,6 @@ while True:
                                         break
                                 else:
                                         if float(line) > highestbid:
-                                                if count == 1:
-                                                        lowestask = float(line)
                                                 with open(ramdiskpath+'/'+market+'/asks/'+line) as fp2:
                                                         for line2 in fp2:
                                                                 fname = line2.strip('\n\r').split(sep)
@@ -97,8 +95,6 @@ while True:
                                         break
                                 else:
                                         if float(line) <= lowestask:
-                                                if count == 1:
-                                                        highestbid = float(line)
                                                 with open(ramdiskpath+'/'+market+'/bids/'+line) as fp2:
                                                         for line2 in fp2:
                                                                 fname = line2.strip('\n\r').split(sep)
@@ -134,8 +130,6 @@ while True:
                                         break
                                 else:
                                         if float(line) >= highestbid:
-                                                if count == 1:
-                                                        lowestask = float(line)
                                                 with open(ramdiskpath+'/'+market+'/asks/'+line) as fp2:
                                                         for line2 in fp2:
                                                                 fname = line2.strip('\n\r').split(sep)
@@ -156,8 +150,6 @@ while True:
                                         break
                                 else:
                                         if float(line) < lowestask:
-                                                if count == 1:
-                                                        highestbid = float(line)
                                                 with open(ramdiskpath+'/'+market+'/bids/'+line) as fp2:
                                                         for line2 in fp2:
                                                                 fname = line2.strip('\n\r').split(sep)
