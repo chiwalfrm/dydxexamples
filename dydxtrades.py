@@ -1,3 +1,4 @@
+vmware@ubuntu20041a:~/extra$ cat dydxtrades.py
 import datetime
 import json
 import logging
@@ -10,16 +11,29 @@ from os.path import exists
 from sys import platform
 from websocket import create_connection
 
+def openconnection():
+        global ws
+        global api_data
+        ws = create_connection("wss://api.dydx.exchange/v3/ws")
+        api_data = {"type":"subscribe", "channel":"v3_trades", "id":market}
+        ws.send(json.dumps(api_data))
+        api_data = ws.recv()
+        api_data = json.loads(api_data)
+        pp.pprint(api_data)
+        api_data = ws.recv()
+        api_data = json.loads(api_data)
+        pp.pprint(api_data)
+
+logger = logging.getLogger("Rotating Log")
+logger.setLevel(logging.INFO)
+pp = pprint.PrettyPrinter(width = 41, compact = True)
 if platform == "linux" or platform == "linux2":
         # linux
         ramdiskpath = '/mnt/ramdisk'
 elif platform == "darwin":
         # OS X
         ramdiskpath = '/Volumes/RAMDisk'
-logger = logging.getLogger("Rotating Log")
-logger.setLevel(logging.INFO)
 
-pp = pprint.PrettyPrinter(width = 41, compact = True)
 if len(sys.argv) < 2:
         market = 'BTC-USD'
 else:
@@ -27,20 +41,14 @@ else:
 handler = RotatingFileHandler(ramdiskpath+'/dydxtrades'+market+'.log', maxBytes=1048576,
                               backupCount = 4)
 logger.addHandler(handler)
+
 if exists(ramdiskpath) == False:
         print('Error: Ramdisk', ramdiskpath, 'not mounted')
         exit()
 if os.path.ismount(ramdiskpath) == False:
         print('Warning:', ramdiskpath, 'is not a mount point')
-ws = create_connection("wss://api.dydx.exchange/v3/ws")
-api_data = {"type":"subscribe", "channel":"v3_trades", "id":market}
-ws.send(json.dumps(api_data))
-api_data = ws.recv()
-api_data = json.loads(api_data)
-pp.pprint(api_data)
-api_data = ws.recv()
-api_data = json.loads(api_data)
-pp.pprint(api_data)
+
+openconnection()
 while True:
         try:
                 trades = api_data['contents']['trades'][0]
@@ -61,3 +69,4 @@ while True:
                 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
                 ws.close()
                 time.sleep(1)
+                openconnection()
