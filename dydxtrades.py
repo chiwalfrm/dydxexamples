@@ -55,8 +55,8 @@ while True:
                 tradeprice = trades['price']
                 tradeside = trades['side']
                 tradesize = trades['size']
-                with open(ramdiskpath+'/'+market+'/lasttrade', "w") as fp:
-                        fp.write(tradecreatedat+' '+tradeprice+' '+tradeside+' ('+tradesize+')\n')
+                fp = open(ramdiskpath+'/'+market+'/lasttrade', "w")
+                fp.write(tradecreatedat+' '+tradeprice+' '+tradeside+' ('+tradesize+')\n')
                 fp.close()
                 logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' '+tradecreatedat+' '+tradeprice+' '+tradeside.ljust(4)+' ('+tradesize+')')
                 api_data = ws.recv()
