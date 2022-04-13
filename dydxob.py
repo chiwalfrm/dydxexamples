@@ -12,31 +12,31 @@ from websocket import create_connection
 
 def checkaskfiles():
         if exists(ramdiskpath+'/'+market+'/asks/'+askprice) == True:
-                with open(ramdiskpath+'/'+market+'/asks/'+askprice) as fp:
-                        for line in fp:
-                                fname = line.strip('\n\r').split(sep)
-                                faskoffset = fname[0]
-                                fasksize = fname[1]
+                fp = open(ramdiskpath+'/'+market+'/asks/'+askprice)
+                line = fp.readline()
+                fname = line.strip('\n\r').split(sep)
                 fp.close()
+                faskoffset = fname[0]
+                fasksize = fname[1]
         if exists(ramdiskpath+'/'+market+'/asks/'+askprice) == False or askoffset > faskoffset:
-                with open(ramdiskpath+'/'+market+'/asks/'+askprice, "w") as fp:
-                        fp.write(askoffset+' '+asksize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
-                logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/asks/'+askprice+': '+str('('+asksize+')').ljust(10)+' '+askoffset)
+                fp = open(ramdiskpath+'/'+market+'/asks/'+askprice, "w")
+                fp.write(askoffset+' '+asksize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                 fp.close()
+                logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/asks/'+askprice+': '+str('('+asksize+')').ljust(10)+' '+askoffset)
 
 def checkbidfiles():
         if exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == True:
-                with open(ramdiskpath+'/'+market+'/bids/'+bidprice) as fp:
-                        for line in fp:
-                                fname = line.strip('\n\r').split(sep)
-                                fbidoffset = fname[0]
-                                fbidsize = fname[1]
+                fp = open(ramdiskpath+'/'+market+'/bids/'+bidprice)
+                line = fp.readline()
+                fname = line.strip('\n\r').split(sep)
                 fp.close()
+                fbidoffset = fname[0]
+                fbidsize = fname[1]
         if exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == False or bidoffset > fbidoffset:
-                with open(ramdiskpath+'/'+market+'/bids/'+bidprice, "w") as fp:
-                        fp.write(bidoffset+' '+bidsize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
-                logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/bids/'+bidprice+': '+str('('+bidsize+')').ljust(10)+' '+bidoffset)
+                fp = open(ramdiskpath+'/'+market+'/bids/'+bidprice, "w")
+                fp.write(bidoffset+' '+bidsize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                 fp.close()
+                logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/bids/'+bidprice+': '+str('('+bidsize+')').ljust(10)+' '+bidoffset)
 
 def openconnection():
         global ws
