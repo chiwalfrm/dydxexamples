@@ -49,14 +49,16 @@ if exists(ramdiskpath+'/'+market+'/lasttrade') == False:
         print('Error: lasttrade file', ramdiskpath+'/'+market+'/lasttrade', 'not found')
         exit()
 while True:
-        with open(ramdiskpath+'/'+market+'/lasttrade') as fp:
-                for line in fp:
-                        fname = line.strip('\n\r').split(sep)
-                        fcreatedat = fname[0]
-                        fprice = fname[1]
-                        fside = fname[2]
-                        fsize = fname[3]
-        fp.close()
+        fname = []
+        while len(fname) != 4:
+                fp = open(ramdiskpath+'/'+market+'/lasttrade')
+                line = fp.readline()
+                fname = line.strip('\n\r').split(sep)
+                fp.close()
+        fcreatedat = fname[0]
+        fprice = fname[1]
+        fside = fname[2]
+        fsize = fname[3]
         askarray = []
         bidarray = []
         os.system('ls '+ramdiskpath+'/'+market+'/asks | sort -n > '+ramdiskpath+'/'+market+'/lista'+str(pid))
@@ -84,17 +86,19 @@ while True:
                                         break
                                 else:
                                         if float(line) > highestbid:
-                                                with open(ramdiskpath+'/'+market+'/asks/'+line) as fp2:
-                                                        for line2 in fp2:
-                                                                fname = line2.strip('\n\r').split(sep)
-                                                                faskoffset = fname[0]
-                                                                fasksize = fname[1]
-                                                                fdate = fname[2]
-                                                                ftime = fname[3]
-                                                                if fasksize != '0':
-                                                                        askarray.append([line, fasksize, faskoffset, fdate, ftime])
-                                                                        count += 1
-                                                fp2.close()
+                                                fname = []
+                                                while len(fname) != 4:
+                                                        fp2 = open(ramdiskpath+'/'+market+'/asks/'+line)
+                                                        line2 = fp2.readline()
+                                                        fname = line2.strip('\n\r').split(sep)
+                                                        fp2.close()
+                                                faskoffset = fname[0]
+                                                fasksize = fname[1]
+                                                fdate = fname[2]
+                                                ftime = fname[3]
+                                                if fasksize != '0':
+                                                        askarray.append([line, fasksize, faskoffset, fdate, ftime])
+                                                        count += 1
                 fp.close()
                 count = 1
                 with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
@@ -104,17 +108,19 @@ while True:
                                         break
                                 else:
                                         if float(line) < lowestask:
-                                                with open(ramdiskpath+'/'+market+'/bids/'+line) as fp2:
-                                                        for line2 in fp2:
-                                                                fname = line2.strip('\n\r').split(sep)
-                                                                fbidoffset = fname[0]
-                                                                fbidsize = fname[1]
-                                                                fdate = fname[2]
-                                                                ftime = fname[3]
-                                                                if fbidsize != '0':
-                                                                        bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
-                                                                        count += 1
-                                                fp2.close()
+                                                fname = []
+                                                while len(fname) != 4:
+                                                        fp2 = open(ramdiskpath+'/'+market+'/bids/'+line)
+                                                        line2 = fp2.readline()
+                                                        fname = line2.strip('\n\r').split(sep)
+                                                        fp2.close()
+                                                fbidoffset = fname[0]
+                                                fbidsize = fname[1]
+                                                fdate = fname[2]
+                                                ftime = fname[3]
+                                                if fbidsize != '0':
+                                                        bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
+                                                        count += 1
                 fp.close()
         else:
                 with open(ramdiskpath+'/'+market+'/lista'+str(pid)) as fp:
@@ -139,17 +145,19 @@ while True:
                                         break
                                 else:
                                         if float(line) > highestbid:
-                                                with open(ramdiskpath+'/'+market+'/asks/'+line) as fp2:
-                                                        for line2 in fp2:
-                                                                fname = line2.strip('\n\r').split(sep)
-                                                                faskoffset = fname[0]
-                                                                fasksize = fname[1]
-                                                                fdate = fname[2]
-                                                                ftime = fname[3]
-                                                                if fasksize != '0':
-                                                                        askarray.append([line, fasksize, faskoffset, fdate, ftime])
-                                                                        count += 1
-                                                fp2.close()
+                                                fname = []
+                                                while len(fname) != 4:
+                                                        fp2 = open(ramdiskpath+'/'+market+'/asks/'+line)
+                                                        line2 = fp2.readline()
+                                                        fname = line2.strip('\n\r').split(sep)
+                                                        fp2.close()
+                                                faskoffset = fname[0]
+                                                fasksize = fname[1]
+                                                fdate = fname[2]
+                                                ftime = fname[3]
+                                                if fasksize != '0':
+                                                        askarray.append([line, fasksize, faskoffset, fdate, ftime])
+                                                        count += 1
                 fp.close()
                 count = 1
                 with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
@@ -159,17 +167,19 @@ while True:
                                         break
                                 else:
                                         if float(line) < lowestask:
-                                                with open(ramdiskpath+'/'+market+'/bids/'+line) as fp2:
-                                                        for line2 in fp2:
-                                                                fname = line2.strip('\n\r').split(sep)
-                                                                fbidoffset = fname[0]
-                                                                fbidsize = fname[1]
-                                                                fdate = fname[2]
-                                                                ftime = fname[3]
-                                                                if fbidsize != '0':
-                                                                        bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
-                                                                        count += 1
-                                                fp2.close()
+                                                fname = []
+                                                while len(fname) != 4:
+                                                        fp2 = open(ramdiskpath+'/'+market+'/bids/'+line)
+                                                        line2 = fp2.readline()
+                                                        fname = line2.strip('\n\r').split(sep)
+                                                        fp2.close()
+                                                fbidoffset = fname[0]
+                                                fbidsize = fname[1]
+                                                fdate = fname[2]
+                                                ftime = fname[3]
+                                                if fbidsize != '0':
+                                                        bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
+                                                        count += 1
                 fp.close()
         if len(sys.argv) > 3 and ( sys.argv[3] == 'compact' or sys.argv[3] == 'ultracompact' ):
                 if sys.argv[3] == 'compact':
