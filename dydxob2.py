@@ -1,5 +1,6 @@
 import datetime
 import os
+import pprint
 import signal
 import sys
 import time
@@ -27,10 +28,11 @@ def handler(signum, frame):
         os.system('rm '+ramdiskpath+'/'+market+'/listb'+str(pid))
         exit()
 
-signal.signal(signal.SIGINT, handler)
-
+pp = pprint.PrettyPrinter(width = 41, compact = True)
+print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxob2.py')
 pid = os.getpid()
 sep = " "
+signal.signal(signal.SIGINT, handler)
 if len(sys.argv) < 2:
         market = 'BTC-USD'
 else:
@@ -46,175 +48,106 @@ if exists(ramdiskpath+'/'+market+'/bids') == False:
         print('Error: Bids directory', ramdiskpath+'/'+market+'/bids', 'not found')
         exit()
 if exists(ramdiskpath+'/'+market+'/lasttrade') == False:
-        print('Error: lasttrade file', ramdiskpath+'/'+market+'/lasttrade', 'not found')
-        exit()
+        print('Warning: lasttrade file', ramdiskpath+'/'+market+'/lasttrade', 'not found')
 while True:
-        fname = []
-        while len(fname) != 4:
-                fp = open(ramdiskpath+'/'+market+'/lasttrade')
-                line = fp.readline()
-                fname = line.strip('\n\r').split(sep)
-                fp.close()
-        fcreatedat = fname[0]
-        fprice = fname[1]
-        fside = fname[2]
-        fsize = fname[3]
+        if exists(ramdiskpath+'/'+market+'/lasttrade') == True:
+                fname = []
+                while len(fname) != 4:
+                        fp = open(ramdiskpath+'/'+market+'/lasttrade')
+                        line = fp.readline()
+                        fname = line.strip('\n\r').split(sep)
+                        fp.close()
+                fcreatedat = fname[0]
+                fprice = fname[1]
+                fside = fname[2]
+                fsize = fname[3]
+        else:
+                fcreatedat = 0
         askarray = []
         bidarray = []
         os.system('ls '+ramdiskpath+'/'+market+'/asks | sort -n > '+ramdiskpath+'/'+market+'/lista'+str(pid))
         os.system('ls '+ramdiskpath+'/'+market+'/bids | sort -n -r > '+ramdiskpath+'/'+market+'/listb'+str(pid))
-        if fside == 'BUY':
-                with open(ramdiskpath+'/'+market+'/lista'+str(pid)) as fp:
-                        for line in fp:
-                                line = line.strip('\n\r')
-                                if float(line) >= float(fprice):
-                                        lowestask = float(line)
-                                        break
-                fp.close()
-                with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
-                        for line in fp:
-                                line = line.strip('\n\r')
-                                if float(line) < float(fprice):
-                                        highestbid = float(line)
-                                        break
-                fp.close()
-                count = 1
-                with open(ramdiskpath+'/'+market+'/lista'+str(pid)) as fp:
-                        for line in fp:
-                                line = line.strip('\n\r')
-                                if count > depth:
-                                        break
-                                else:
-                                        if float(line) > highestbid:
-                                                fname = []
-                                                while len(fname) != 4:
-                                                        fp2 = open(ramdiskpath+'/'+market+'/asks/'+line)
-                                                        line2 = fp2.readline()
-                                                        fname = line2.strip('\n\r').split(sep)
-                                                        fp2.close()
-                                                faskoffset = fname[0]
-                                                fasksize = fname[1]
-                                                fdate = fname[2]
-                                                ftime = fname[3]
-                                                if fasksize != '0':
-                                                        askarray.append([line, fasksize, faskoffset, fdate, ftime])
-                                                        count += 1
-                fp.close()
-                count = 1
-                with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
-                        for line in fp:
-                                line = line.strip('\n\r')
-                                if count > depth:
-                                        break
-                                else:
-                                        if float(line) < lowestask:
-                                                fname = []
-                                                while len(fname) != 4:
-                                                        fp2 = open(ramdiskpath+'/'+market+'/bids/'+line)
-                                                        line2 = fp2.readline()
-                                                        fname = line2.strip('\n\r').split(sep)
-                                                        fp2.close()
-                                                fbidoffset = fname[0]
-                                                fbidsize = fname[1]
-                                                fdate = fname[2]
-                                                ftime = fname[3]
-                                                if fbidsize != '0':
-                                                        bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
-                                                        count += 1
-                fp.close()
-        else:
-                with open(ramdiskpath+'/'+market+'/lista'+str(pid)) as fp:
-                        for line in fp:
-                                line = line.strip('\n\r')
-                                if float(line) > float(fprice):
-                                        lowestask = float(line)
-                                        break
-                fp.close()
-                with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
-                        for line in fp:
-                                line = line.strip('\n\r')
-                                if float(line) <= float(fprice):
-                                        highestbid = float(line)
-                                        break
-                fp.close()
-                count = 1
-                with open(ramdiskpath+'/'+market+'/lista'+str(pid)) as fp:
-                        for line in fp:
-                                line = line.strip('\n\r')
-                                if count > depth:
-                                        break
-                                else:
-                                        if float(line) > highestbid:
-                                                fname = []
-                                                while len(fname) != 4:
-                                                        fp2 = open(ramdiskpath+'/'+market+'/asks/'+line)
-                                                        line2 = fp2.readline()
-                                                        fname = line2.strip('\n\r').split(sep)
-                                                        fp2.close()
-                                                faskoffset = fname[0]
-                                                fasksize = fname[1]
-                                                fdate = fname[2]
-                                                ftime = fname[3]
-                                                if fasksize != '0':
-                                                        askarray.append([line, fasksize, faskoffset, fdate, ftime])
-                                                        count += 1
-                fp.close()
-                count = 1
-                with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
-                        for line in fp:
-                                line = line.strip('\n\r')
-                                if count > depth:
-                                        break
-                                else:
-                                        if float(line) < lowestask:
-                                                fname = []
-                                                while len(fname) != 4:
-                                                        fp2 = open(ramdiskpath+'/'+market+'/bids/'+line)
-                                                        line2 = fp2.readline()
-                                                        fname = line2.strip('\n\r').split(sep)
-                                                        fp2.close()
-                                                fbidoffset = fname[0]
-                                                fbidsize = fname[1]
-                                                fdate = fname[2]
-                                                ftime = fname[3]
-                                                if fbidsize != '0':
-                                                        bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
-                                                        count += 1
-                fp.close()
-        if len(sys.argv) > 3 and ( sys.argv[3] == 'compact' or sys.argv[3] == 'ultracompact' ):
-                if sys.argv[3] == 'compact':
-                        print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), fcreatedat, fprice, fside, fsize)
-                        print('Bid                              | Ask')
-                elif sys.argv[3] == 'ultracompact':
-                        print(fcreatedat[5:], fprice, fside, fsize)
-                        print('Bid                | Ask')
-        else:
-                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Last trade:', fcreatedat, fprice, fside, fsize)
-                print('Bid                                                | Ask')
+        with open(ramdiskpath+'/'+market+'/lista'+str(pid)) as fp:
+                for line in fp:
+                        line = line.strip('\n\r')
+                        fname = []
+                        while len(fname) != 4:
+                                fp2 = open(ramdiskpath+'/'+market+'/asks/'+line)
+                                line2 = fp2.readline()
+                                fname = line2.strip('\n\r').split(sep)
+                                fp2.close()
+                        faskoffset = fname[0]
+                        fasksize = fname[1]
+                        fdate = fname[2]
+                        ftime = fname[3]
+                        if fasksize != '0':
+                                askarray.append([line, fasksize, faskoffset, fdate, ftime])
+        with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
+                for line in fp:
+                        line = line.strip('\n\r')
+                        fname = []
+                        while len(fname) != 4:
+                                fp2 = open(ramdiskpath+'/'+market+'/bids/'+line)
+                                line2 = fp2.readline()
+                                fname = line2.strip('\n\r').split(sep)
+                                fp2.close()
+                        fbidoffset = fname[0]
+                        fbidsize = fname[1]
+                        fdate = fname[2]
+                        ftime = fname[3]
+                        if fbidsize != '0':
+                                bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
+        highestbidprice = 0
+        while highestbidprice == 0 or highestbidprice > lowestaskprice:
+                highestbid = bidarray[0]
+                lowestask = askarray[0]
+                highestbidprice = float(highestbid[0])
+                lowestaskprice = float(lowestask[0])
+                highestbidoffset = int(highestbid[2])
+                lowestaskoffset = int(lowestask[2])
+                if highestbidoffset < lowestaskoffset:
+                        bidarray.pop(0)
+                else:
+                        askarray.pop(0)
         count = 0
         highestoffset = 0
         bidsizetotal = 0
         asksizetotal = 0
+        if len(sys.argv) > 3 and ( sys.argv[3] == 'compact' or sys.argv[3] == 'ultracompact' ):
+                if sys.argv[3] == 'compact':
+                        if fcreatedat != 0:
+                                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), fcreatedat, fprice, fside, fsize)
+                        print('Bid                              | Ask')
+                elif sys.argv[3] == 'ultracompact':
+                        if fcreatedat != 0:
+                                print(fcreatedat[5:], fprice, fside, fsize)
+                        print('Bid                | Ask')
+        else:
+                if fcreatedat != 0:
+                        print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Last trade:', fcreatedat, fprice, fside, fsize)
+                print('Bid                                                | Ask')
         while count < min(depth, len(bidarray), len(askarray)):
                 biditem = bidarray[count]
-                biditemprice = biditem[0]
-                biditemsize = biditem[1]
-                biditemoffset = biditem[2]
+                biditemprice = float(biditem[0])
+                biditemsize = float(biditem[1])
+                biditemoffset = int(biditem[2])
                 biditemdate = ' '+biditem[3]
                 biditemtime = ' '+biditem[4]
                 askitem = askarray[count]
-                askitemprice = askitem[0]
-                askitemsize = askitem[1]
-                askitemoffset = askitem[2]
+                askitemprice = float(askitem[0])
+                askitemsize = float(askitem[1])
+                askitemoffset = int(askitem[2])
                 askitemdate = ' '+askitem[3]
                 askitemtime = ' '+askitem[4]
-                highestoffset = max(int(biditemoffset), int(askitemoffset), highestoffset)
-                bidsizetotal += float(biditemsize)
-                asksizetotal += float(askitemsize)
+                highestoffset = max(biditemoffset, askitemoffset, highestoffset)
+                bidsizetotal += biditemsize
+                asksizetotal += askitemsize
                 if count == 0:
-                        lowestoffset = min(int(biditemoffset), int(askitemoffset))
+                        highestbidprice = biditemprice
+                        lowestaskprice = askitemprice
+                        lowestoffset = min(biditemoffset, askitemoffset)
                 else:
-                        lowestoffset = min(int(biditemoffset), int(askitemoffset), lowestoffset)
+                        lowestoffset = min(biditemoffset, askitemoffset, lowestoffset)
                 if len(sys.argv) > 3 and ( sys.argv[3] == 'compact' or sys.argv[3] == 'ultracompact' ):
                         if sys.argv[3] == 'compact':
                                 biditemoffset = ''
@@ -229,18 +162,18 @@ while True:
                                 biditemtime = ''
                                 askitemtime = ''
                 else:
-                        biditemoffset = ' '+biditemoffset
-                        askitemoffset = ' '+askitemoffset
-                print(biditemprice.ljust(7), str('('+biditemsize+')').ljust(10)+biditemoffset+biditemdate+biditemtime+' | '+askitemprice.ljust(7), str('('+askitemsize+')').ljust(10)+askitemoffset+askitemdate+askitemtime, end = '\r')
-                if sys.argv[-1] != 'noansi':
-                        if biditemprice == fprice:
-                                print(REDWHITE+biditemprice+NC, end = '\r')
-                        elif askitemprice == fprice:
-                                print(biditemprice.ljust(7), str('('+biditemsize+')').ljust(10)+biditemoffset+biditemdate+biditemtime+' | '+GREENWHITE+askitemprice+NC, end = '\r')
+                        biditemoffset = ' '+str(biditemoffset)
+                        askitemoffset = ' '+str(askitemoffset)
+                print(str(biditemprice).ljust(7), str('('+str(biditemsize)+')').ljust(10)+biditemoffset+biditemdate+biditemtime+' | '+str(askitemprice).ljust(7), str('('+str(askitemsize)+')').ljust(10)+askitemoffset+askitemdate+askitemtime, end = '\r')
+                if sys.argv[-1] != 'noansi' and fcreatedat != 0:
+                        if biditemprice == float(fprice):
+                                print(REDWHITE+str(biditemprice)+NC, end = '\r')
+                        elif askitemprice == float(fprice):
+                                print(str(biditemprice).ljust(7), str('('+str(biditemsize)+')').ljust(10)+biditemoffset+biditemdate+biditemtime+' | '+GREENWHITE+str(askitemprice)+NC, end = '\r')
                 print()
                 count += 1
-        print('maxbid   :', highestbid)
-        print('minask   :', lowestask, '(+'+'{0:.4f}'.format(lowestask - highestbid)+')', '{0:.4f}'.format((lowestask - highestbid) / highestbid * 100)+'%')
+        print('maxbid   :', highestbidprice)
+        print('minask   :', lowestaskprice, '(+'+'{0:.4f}'.format(lowestaskprice - highestbidprice)+')', '{0:.4f}'.format((lowestaskprice - highestbidprice) / highestbidprice * 100)+'%')
         print('bidvolume:', bidsizetotal)
         print('askvolume:', asksizetotal)
         print('minoffset:', lowestoffset)
