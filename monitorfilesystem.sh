@@ -6,12 +6,12 @@ fi
 filesystem=$1
 while true
 do
-        if [ "`df $1 | tail -1 | awk '{print $5}' | tr -d '%'`" -gt 90 ]
+        if [ "`df "$filesystem" | tail -1 | awk '{print $5}' | tr -d '%'`" -gt 90 ]
         then
 ##### THIS CODE BLOCKS RUNS WHEN FILESYSTEM IS >90% FULL
-                ls -d $filesystem/list* | cut -d / -f 4 | sort -u | while read l1
+                ls -d /mnt/ramdisk/*/list* | cut -d / -f 1-4 | sort -u | while read l1
                 do
-                        touch $filesystem/$l1/EXITFLAG
+                        touch $l1/EXITFLAG
                 done
 ##### END OF CODE BLOCK
                 break
