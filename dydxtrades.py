@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import pprint
+import random
 import sys
 import time
 from logging.handlers import RotatingFileHandler
@@ -23,6 +24,7 @@ def openconnection():
         api_data = json.loads(api_data)
         pp.pprint(api_data)
 
+print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxtrades.py')
 logger = logging.getLogger("Rotating Log")
 logger.setLevel(logging.INFO)
 pp = pprint.PrettyPrinter(width = 41, compact = True)
@@ -68,4 +70,9 @@ while True:
                 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
                 ws.close()
                 time.sleep(1)
-                openconnection()
+                try:
+                        openconnection()
+                except Exception as error:
+                        print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
+                        ws.close()
+                        time.sleep(random.randint(1,10))
