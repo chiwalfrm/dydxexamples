@@ -1,4 +1,9 @@
 #!/bin/sh
+if [ "`uname`" = "Darwin" ]
+then
+        ramdiskpath="/Volumes/RAMDisk"
+else
+        ramdiskpath=/mnt/ramdisk
 if [ $# -eq 0 ]
 then
         echo "Error: Must specify filesystem to monitor"
@@ -9,7 +14,7 @@ do
         if [ "`df "$filesystem" | tail -1 | awk '{print $5}' | tr -d '%'`" -gt 90 ]
         then
 ##### THIS CODE BLOCKS RUNS WHEN FILESYSTEM IS >90% FULL
-                ls -d /mnt/ramdisk/*/list* | cut -d / -f 1-4 | sort -u | while read l1
+                ls -d "$ramdiskpath"/*/list* | cut -d / -f 1-4 | sort -u | while read l1
                 do
                         touch $l1/EXITFLAG
                 done
