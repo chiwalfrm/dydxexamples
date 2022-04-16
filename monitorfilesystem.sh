@@ -4,6 +4,7 @@ then
         ramdiskpath="/Volumes/RAMDisk"
 else
         ramdiskpath=/mnt/ramdisk
+fi
 if [ $# -eq 0 ]
 then
         echo "Error: Must specify filesystem to monitor"
