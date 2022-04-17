@@ -1,4 +1,5 @@
 #!/bin/sh
+#updated
 
 baseurl=http://lawrencedydx.freeddns.org:8080
 
