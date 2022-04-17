@@ -45,7 +45,12 @@ update_rewards_for_account ()
         address=$1
         if [ "$startingepoch" -ne 0 ]
         then
-                lastrewards=`grep -i "^$address"$"\t" epoch$startingepoch.txt | awk '{print $2}'`
+                if [ "`uname`" = "Darwin" ]
+                then
+                        lastrewards=`grep -i "^$address"$"\t" epoch$startingepoch.txt | awk '{print $2}'`
+                else
+                        lastrewards=`grep -i -P "^$address\t" epoch$startingepoch.txt | awk '{print $2}'`
+                fi
         else
                 lastrewards=""
         fi
@@ -60,7 +65,12 @@ update_rewards_for_account ()
         fi
         while [ $fstartingepoch -le $lastepoch ]
         do
-                rewards=`grep -i "^$address"$"\t" epoch$fstartingepoch.txt | awk '{print $2}'`
+                if [ "`uname`" = "Darwin" ]
+                then
+                        rewards=`grep -i "^$address"$"\t" epoch$fstartingepoch.txt | awk '{print $2}'`
+                else
+                        rewards=`grep -i -P "^$address\t" epoch$fstartingepoch.txt | awk '{print $2}'`
+                fi
                 if [ "$rewards" = "" ]
                 then
                         rewards=0
@@ -130,9 +140,9 @@ cp $TMPFOLDER/update_rewards$$/output/fulllist.html $TMPFOLDER/update_rewards$$/
 echo "STAGE  7 Generating parallel workloads..."
 if [ "`uname`" = "Darwin" ]
 then
-        split -l $((totaladdresses / `sysctl -a | grep machdep.cpu.thread_count | awk '{print $2}'`)) epochaccounts_sorted_alpha.txt $TMPFOLDER/update_rewards$$/x
+        split -l $((totaladdresses / `sysctl -a | grep machdep.cpu.core_count | awk '{print $2}'`)) epochaccounts_sorted_alpha.txt $TMPFOLDER/update_rewards$$/x
 else
-        split -n l/$((`nproc`*2)) epochaccounts_sorted_alpha.txt $TMPFOLDER/update_rewards$$/x
+        split -n l/$((`nproc`)) epochaccounts_sorted_alpha.txt $TMPFOLDER/update_rewards$$/x
 fi
 echo "STAGE  8 Executing parallel jobs..."
 for xfile in `cd $TMPFOLDER/update_rewards$$; ls x??`
@@ -168,5 +178,6 @@ echo "</body></html>" >> $TMPFOLDER/update_rewards$$/output/fulllist.html
 echo "</body></html>" >> $TMPFOLDER/update_rewards$$/output/whalelist.html
 WORKINGDIR=`pwd`
 cd $TMPFOLDER/update_rewards$$/output && tar cf - . | ( cd "$WORKINGDIR"/output && tar xf - )
+cd "$WORKINGDIR"
 cleanup
 echo "STAGE 11 Complete"
