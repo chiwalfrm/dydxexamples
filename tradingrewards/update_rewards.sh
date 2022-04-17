@@ -4,16 +4,29 @@ baseurl=http://lawrencedydx.freeddns.org:8080
 
 cleanup ()
 {
+        if [ "$1" = "trap" ]
+        then
+                echo
+                echo "Ctrl-C detected. Cleaning up..."
+                if [ "`uname`" = "Darwin" ]
+                then
+                        kill -TERM `ps -ef | awk '{print $2" "$3}' | grep " $ppid$" | awk '{print $1}'`
+                else
+                        kill -TERM `ps h --ppid $pid -o pid`
+                fi
+                sleep 60
+        fi
         if [ "`uname`" = "Darwin" ]
         then
                 hdiutil detach $TMPFOLDER
         else
                 sudo umount $TMPFOLDER
         fi
+        exit
 }
 
 pid=$$
-trap 'echo; echo "Ctrl-C detected. Cleaning up..."; kill -TERM `ps h --ppid $pid -o pid`; cleanup; exit' INT HUP
+trap 'cleanup trap' INT HUP
 
 prepare_epoch_file ()
 {
@@ -151,6 +164,5 @@ echo "</body></html>" >> $TMPFOLDER/update_rewards$$/output/fulllist.html
 echo "</body></html>" >> $TMPFOLDER/update_rewards$$/output/whalelist.html
 WORKINGDIR=`pwd`
 cd $TMPFOLDER/update_rewards$$/output && tar cf - . | ( cd "$WORKINGDIR"/output && tar xf - )
-#cd $TMPFOLDER/update_rewards$$ && tar cf - . | gzip -c > /tmp/update_rewards$$.tar.gz
-#cleanup
+cleanup
 echo "STAGE 11 Complete"
