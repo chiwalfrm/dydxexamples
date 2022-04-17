@@ -6,17 +6,18 @@ cleanup ()
 {
         if [ "$1" = "trap" ]
         then
+                trap - EXIT INT HUP
                 echo
-                echo "Ctrl-C detected. Cleaning up..."
+                echo "Ctrl-C detected. Cleaning up. Please wait 60 seconds..."
                 if [ "`uname`" = "Darwin" ]
                 then
-                        killpids="`ps -ef | awk '{print $2" "$3}' | grep " $ppid$" | awk '{print $1}'`"
+                        killpids="`ps -ef | awk '{print $2" "$3}' | grep " $pid$" | awk '{print $1}'`"
                 else
                         killpids="`ps h --ppid $pid -o pid`"
                 fi
                 if [ "$killpids" != "" ]
                 then
-                        kill -TERM $killpids
+                        kill -TERM $killpids 2>> /dev/null
                 fi
                 sleep 60
         fi
