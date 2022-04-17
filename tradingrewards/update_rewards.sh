@@ -28,7 +28,7 @@ update_rewards_for_account ()
         address=$1
         if [ "$startingepoch" -ne 0 ]
         then
-                lastrewards=`grep -i -P "^$address\t" epoch$startingepoch.txt | awk '{print $2}'`
+                lastrewards=`grep -i "^$address"$"\t" epoch$startingepoch.txt | awk '{print $2}'`
         else
                 lastrewards=""
         fi
@@ -43,7 +43,7 @@ update_rewards_for_account ()
         fi
         while [ $fstartingepoch -le $lastepoch ]
         do
-                rewards=`grep -i -P "^$address\t" epoch$fstartingepoch.txt | awk '{print $2}'`
+                rewards=`grep -i "^$address"$"\t" epoch$fstartingepoch.txt | awk '{print $2}'`
                 if [ "$rewards" = "" ]
                 then
                         rewards=0
