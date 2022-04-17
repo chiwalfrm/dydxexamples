@@ -10,9 +10,13 @@ cleanup ()
                 echo "Ctrl-C detected. Cleaning up..."
                 if [ "`uname`" = "Darwin" ]
                 then
-                        kill -TERM `ps -ef | awk '{print $2" "$3}' | grep " $ppid$" | awk '{print $1}'`
+                        killpids="`ps -ef | awk '{print $2" "$3}' | grep " $ppid$" | awk '{print $1}'`"
                 else
-                        kill -TERM `ps h --ppid $pid -o pid`
+                        killpids="`ps h --ppid $pid -o pid`"
+                fi
+                if [ "$killpids" != "" ]
+                then
+                        kill -TERM $killpids
                 fi
                 sleep 60
         fi
