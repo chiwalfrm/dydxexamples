@@ -86,6 +86,21 @@ update_rewards_for_account ()
         done
 }
 
+intensity=${1:-low}
+if [ "`uname`" = "Darwin" ]
+then
+        parallel=`sysctl -a | grep machdep.cpu.core_count | awk '{print $2}'`
+else
+        parallel=`nproc`
+fi
+case $intensity in
+        low)
+                parallel=$((parallel/2))
+                ;;
+        high)
+                parallel=$((parallel*2))
+                ;;
+esac
 echo "STAGE  1 Setting up ramdisk..."
 if [ "`uname`" = "Darwin" ]
 then
@@ -141,9 +156,9 @@ cp $TMPFOLDER/update_rewards$$/output/fulllist.html $TMPFOLDER/update_rewards$$/
 echo "STAGE  7 Generating parallel workloads..."
 if [ "`uname`" = "Darwin" ]
 then
-        split -l $((totaladdresses / `sysctl -a | grep machdep.cpu.core_count | awk '{print $2}'`)) epochaccounts_sorted_alpha.txt $TMPFOLDER/update_rewards$$/x
+        split -l $((totaladdresses/parallel)) epochaccounts_sorted_alpha.txt $TMPFOLDER/update_rewards$$/x
 else
-        split -n l/$((`nproc`)) epochaccounts_sorted_alpha.txt $TMPFOLDER/update_rewards$$/x
+        split -n l/$parallel epochaccounts_sorted_alpha.txt $TMPFOLDER/update_rewards$$/x
 fi
 echo "STAGE  8 Executing parallel jobs..."
 for xfile in `cd $TMPFOLDER/update_rewards$$; ls x??`
