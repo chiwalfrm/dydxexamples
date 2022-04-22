@@ -14,8 +14,13 @@ from websocket import create_connection
 def openconnection():
         global ws
         global api_data
+#       ws = create_connection("wss://api.stage.dydx.exchange/v3/ws")
         ws = create_connection("wss://api.dydx.exchange/v3/ws")
-        api_data = {"type":"subscribe", "channel":"v3_trades", "id":market}
+        api_data = {
+                "type": "subscribe",
+                "channel": "v3_trades",
+                "id": market
+        }
         ws.send(json.dumps(api_data))
         api_data = ws.recv()
         api_data = json.loads(api_data)
