@@ -47,8 +47,14 @@ def openconnection():
         global bidprice
         global bidoffset
         global bidsize
+#       ws = create_connection("wss://api.stage.dydx.exchange/v3/ws")
         ws = create_connection("wss://api.dydx.exchange/v3/ws")
-        api_data = {"type":"subscribe", "channel":"v3_orderbook", "id":market, "includeOffsets":True}
+        api_data = {
+                "type": "subscribe",
+                "channel": "v3_orderbook",
+                "id": market,
+                "includeOffsets": True
+        }
         ws.send(json.dumps(api_data))
         api_data = ws.recv()
         api_data = json.loads(api_data)
