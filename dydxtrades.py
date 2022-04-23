@@ -53,6 +53,8 @@ if exists(ramdiskpath) == False:
         exit()
 if os.path.ismount(ramdiskpath) == False:
         print('Warning:', ramdiskpath, 'is not a mount point')
+if exists(ramdiskpath+'/'+market) == False:
+        os.system('mkdir -p '+ramdiskpath+'/'+market)
 
 openconnection()
 while True:
