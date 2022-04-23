@@ -28,6 +28,7 @@ functions_slowwithdrawal.py
 dydxob.py
 dydxtrades.py
 dydxob2.py
+dydxv3markets.py
 orderbook.pdf
 
 8) Not mentioned on twitter
