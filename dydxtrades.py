@@ -29,6 +29,20 @@ def openconnection():
         api_data = json.loads(api_data)
         pp.pprint(api_data)
 
+def checkwidth(elementname, elementsize):
+        global maxwidthtradeprice
+        global maxwidthtradesize
+        if elementname == 'tradeprice' and elementsize > maxwidthtradeprice:
+                fp = open(ramdiskpath+'/'+market+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthtradeprice = elementsize
+        elif elementname == 'tradesize' and elementsize > maxwidthtradesize:
+                fp = open(ramdiskpath+'/'+market+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthtradesize = elementsize
+
 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxtrades.py')
 logger = logging.getLogger("Rotating Log")
 logger.setLevel(logging.INFO)
@@ -56,6 +70,8 @@ if os.path.ismount(ramdiskpath) == False:
 if exists(ramdiskpath+'/'+market) == False:
         os.system('mkdir -p '+ramdiskpath+'/'+market)
 
+maxwidthtradeprice = 0
+maxwidthtradesize = 0
 openconnection()
 while True:
         try:
@@ -68,6 +84,8 @@ while True:
                 fp.write(tradecreatedat+' '+tradeprice+' '+tradeside+' ('+tradesize+')\n')
                 fp.close()
                 logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' '+tradecreatedat+' '+tradeprice+' '+tradeside.ljust(4)+' ('+tradesize+')')
+                checkwidth('tradeprice', len(tradeprice))
+                checkwidth('tradesize', len(tradesize))
                 api_data = ws.recv()
                 api_data = json.loads(api_data)
         except KeyboardInterrupt:
