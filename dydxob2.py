@@ -7,17 +7,9 @@ import time
 from os.path import exists
 from sys import platform
 
-#maximum widths of output:
-#indexPrice 87
-#nextFundingAt 24
-#nextFundingRate 13
-#openInterest 10
-#oraclePrice 20
-#priceChange24H 11
-#trades24H 5
-#volume24H 16
-#bids/asks 10 (7 from ob2.py)
-#size 9 (10 from ob2.py) plus two for parenthesis
+widthmarketstats = 24
+widthprice = 10
+widthsize = 10
 
 if platform == "linux" or platform == "linux2":
         # linux
@@ -36,8 +28,7 @@ REDWHITE = '\033[0;31m\u001b[47m'
 GREENWHITE = '\033[0;32m\u001b[47m'
 
 def handler(signum, frame):
-        os.system('rm '+ramdiskpath+'/'+market+'/lista'+str(pid))
-        os.system('rm '+ramdiskpath+'/'+market+'/listb'+str(pid))
+        cleanup()
         exit()
 
 def checkmarketdata(file):
@@ -53,7 +44,11 @@ def checkmarketdata(file):
                         element1 = ''
                 else:
                         element1 = ' '+fname[1]+' '+fname[2]
-                print(file.ljust(15)+':', element0[:24].ljust(24)+element1)
+                print(file.ljust(15)+':', element0[:widthmarketstats].ljust(widthmarketstats)+element1)
+
+def cleanup():
+        os.system('rm '+ramdiskpath+'/'+market+'/lista'+str(pid))
+        os.system('rm '+ramdiskpath+'/'+market+'/listb'+str(pid))
 
 pp = pprint.PrettyPrinter(width = 41, compact = True)
 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxob2.py')
@@ -144,15 +139,15 @@ while True:
                 if sys.argv[3] == 'compact':
                         if fcreatedat != 0:
                                 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), fcreatedat, fprice, fside, fsize)
-                        print('Bid                                   | Ask')
+                        print('Bid'+' '.ljust(widthprice+25)+'| Ask')
                 elif sys.argv[3] == 'ultracompact':
                         if fcreatedat != 0:
                                 print(fcreatedat[5:], fprice, fside, fsize)
-                        print('Bid                     | Ask')
+                        print('Bid'+' '.ljust(widthprice+11)+'| Ask')
         else:
                 if fcreatedat != 0:
                         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Last trade:', fcreatedat, fprice, fside, fsize)
-                print('Bid                                                     | Ask')
+                print('Bid'+' '.ljust(widthprice+43)+'| Ask')
         while count < min(depth, len(bidarray), len(askarray)):
                 biditem = bidarray[count]
                 biditemprice = float(biditem[0])
@@ -191,12 +186,12 @@ while True:
                 else:
                         biditemoffset = ' '+str(biditemoffset)
                         askitemoffset = ' '+str(askitemoffset)
-                print(str(biditemprice).ljust(10), str('('+str(biditemsize)+')').ljust(12)+biditemoffset+biditemdate+biditemtime+' | '+str(askitemprice).ljust(10), str('('+str(askitemsize)+')').ljust(12)+askitemoffset+askitemdate+askitemtime, end = '\r')
+                print(str(biditemprice).ljust(widthprice), str('('+str(biditemsize)+')').ljust(widthsize+2)+biditemoffset+biditemdate+biditemtime+' | '+str(askitemprice).ljust(widthprice), str('('+str(askitemsize)+')').ljust(widthsize+2)+askitemoffset+askitemdate+askitemtime, end = '\r')
                 if sys.argv[-1] != 'noansi' and fcreatedat != 0:
                         if biditemprice == float(fprice):
                                 print(REDWHITE+str(biditemprice)+NC, end = '\r')
                         elif askitemprice == float(fprice):
-                                print(str(biditemprice).ljust(10), str('('+str(biditemsize)+')').ljust(12)+biditemoffset+biditemdate+biditemtime+' | '+GREENWHITE+str(askitemprice)+NC, end = '\r')
+                                print(str(biditemprice).ljust(widthprice), str('('+str(biditemsize)+')').ljust(widthsize+2)+biditemoffset+biditemdate+biditemtime+' | '+GREENWHITE+str(askitemprice)+NC, end = '\r')
                 print()
                 count += 1
         print('maxbid   :', highestbidprice)
@@ -215,6 +210,7 @@ while True:
         checkmarketdata('volume24H')
         if exists(ramdiskpath+'/'+market+'/EXITFLAG') == True:
                 os.system('rm '+ramdiskpath+'/'+market+'/EXITFLAG')
+                cleanup()
                 exit()
         else:
                 time.sleep(1)
