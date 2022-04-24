@@ -193,7 +193,7 @@ echo "STAGE 10 Finalizing..."
 echo "</body></html>" >> $TMPFOLDER/update_rewards$$/output/fulllist.html
 echo "</body></html>" >> $TMPFOLDER/update_rewards$$/output/whalelist.html
 WORKINGDIR=`pwd`
-cd $TMPFOLDER/update_rewards$$/output && tar cf - . | ( cd "$WORKINGDIR"/output && tar xf - )
+cd $TMPFOLDER/update_rewards$$/output && find . -newer $TMPFOLDER/update_rewards$$/xaa -type f -print0 | xargs -0 tar cf - | ( cd "$WORKINGDIR"/output && tar xf - )
 cd "$WORKINGDIR"
 cleanup
 echo "STAGE 11 Complete"
