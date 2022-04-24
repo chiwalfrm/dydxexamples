@@ -68,11 +68,29 @@ def openconnection():
                 askoffset = askitem['offset']
                 asksize = askitem['size']
                 checkaskfiles()
+                checkwidth('price', len(askprice))
+                checkwidth('size', len(asksize))
         for biditem in bids:
                 bidprice = biditem['price']
                 bidoffset = biditem['offset']
                 bidsize = biditem['size']
                 checkbidfiles()
+                checkwidth('price', len(bidprice))
+                checkwidth('size', len(bidsize))
+
+def checkwidth(elementname, elementsize):
+        global maxwidthprice
+        global maxwidthsize
+        if elementname == 'price' and elementsize > maxwidthprice:
+                fp = open(ramdiskpath+'/'+market+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthprice = elementsize
+        elif elementname == 'size' and elementsize > maxwidthsize:
+                fp = open(ramdiskpath+'/'+market+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthsize = elementsize
 
 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxob.py')
 logger = logging.getLogger("Rotating Log")
@@ -104,6 +122,8 @@ if exists(ramdiskpath+'/'+market+'/asks') == False:
 if exists(ramdiskpath+'/'+market+'/bids') == False:
         os.system('mkdir -p '+ramdiskpath+'/'+market+'/bids')
 
+maxwidthprice = 0
+maxwidthsize = 0
 openconnection()
 while True:
         try:
@@ -117,11 +137,15 @@ while True:
                         asksize = asks[0][1]
                         askoffset = offset
                         checkaskfiles()
+                        checkwidth('price', len(askprice))
+                        checkwidth('size', len(asksize))
                 if bids != []:
                         bidprice = bids[0][0]
                         bidsize = bids[0][1]
                         bidoffset = offset
                         checkbidfiles()
+                        checkwidth('price', len(bidprice))
+                        checkwidth('size', len(bidsize))
         except KeyboardInterrupt:
                 ws.close()
                 sys.exit(0)
