@@ -24,6 +24,56 @@ def openconnection():
         api_data = json.loads(api_data)
         pp.pprint(api_data)
 
+def checkwidth(elementname, elementsize):
+        global maxwidthindexPrice
+        global maxwidthnextFundingAt
+        global maxwidthnextFundingRate
+        global maxwidthopenInterest
+        global maxwidthoraclePrice
+        global maxwidthpriceChange24H
+        global maxwidthtrades24H
+        global maxwidthvolume24H
+        if elementname == 'indexPrice' and elementsize > maxwidthindexPrice:
+                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthindexPrice = elementsize
+        elif elementname == 'nextFundingAt' and elementsize > maxwidthnextFundingAt:
+                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthnextFundingAt = elementsize
+        elif elementname == 'nextFundingRate' and elementsize > maxwidthnextFundingRate:
+                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthnextFundingRate = elementsize
+        elif elementname == 'openInterest' and elementsize > maxwidthopenInterest:
+                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthopenInterest = elementsize
+        elif elementname == 'oraclePrice' and elementsize > maxwidthoraclePrice:
+                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthoraclePrice = elementsize
+        elif elementname == 'priceChange24H' and elementsize > maxwidthpriceChange24H:
+                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthpriceChange24H = elementsize
+        elif elementname == 'trades24H' and elementsize > maxwidthtrades24H:
+                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthtrades24H = elementsize
+        elif elementname == 'volume24H' and elementsize > maxwidthvolume24H:
+                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
+                fp.write(str(elementsize)+'\n')
+                fp.close()
+                maxwidthvolume24H = elementsize
+
 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxv3markets.py')
 logger = logging.getLogger("Rotating Log")
 logger.setLevel(logging.INFO)
@@ -45,6 +95,14 @@ if exists(ramdiskpath) == False:
 if os.path.ismount(ramdiskpath) == False:
         print('Warning:', ramdiskpath, 'is not a mount point')
 
+maxwidthindexPrice = 0
+maxwidthnextFundingAt = 0
+maxwidthnextFundingRate = 0
+maxwidthopenInterest = 0
+maxwidthoraclePrice = 0
+maxwidthpriceChange24H = 0
+maxwidthtrades24H = 0
+maxwidthvolume24H = 0
 openconnection()
 while True:
         try:
@@ -63,6 +121,7 @@ while True:
                                 fp = open(ramdiskpath+'/'+market+'/'+marketdataelement, "w")
                                 fp.write(marketdatavalue+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                                 fp.close()
+                                checkwidth(marketdataelement, len(marketdatavalue))
         except KeyboardInterrupt:
                 ws.close()
                 sys.exit(0)
