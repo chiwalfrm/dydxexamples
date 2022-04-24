@@ -86,7 +86,7 @@ update_rewards_for_account ()
         done
 }
 
-intensity=${1:-low}
+intensity=${1:-medium}
 if [ "`uname`" = "Darwin" ]
 then
         parallel=`sysctl -a | grep machdep.cpu.core_count | awk '{print $2}'`
