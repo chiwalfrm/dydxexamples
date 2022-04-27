@@ -10,6 +10,7 @@ from sys import platform
 widthmarketstats = 24
 widthprice = 10
 widthsize = 10
+widthoffset = 11
 
 if platform == "linux" or platform == "linux2":
         # linux
@@ -139,15 +140,15 @@ while True:
                 if sys.argv[3] == 'compact':
                         if fcreatedat != 0:
                                 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), fcreatedat, fprice, fside, fsize)
-                        print('Bid'+' '.ljust(widthprice+25)+'| Ask')
+                        print('Bid'+' '.ljust(widthprice+widthsize+15)+'| Ask')
                 elif sys.argv[3] == 'ultracompact':
                         if fcreatedat != 0:
                                 print(fcreatedat[5:], fprice, fside, fsize)
-                        print('Bid'+' '.ljust(widthprice+11)+'| Ask')
+                        print('Bid'+' '.ljust(widthprice+widthsize+1)+'| Ask')
         else:
                 if fcreatedat != 0:
                         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Last trade:', fcreatedat, fprice, fside, fsize)
-                print('Bid'+' '.ljust(widthprice+43)+'| Ask')
+                print('Bid'+' '.ljust(widthprice+widthsize+widthoffset+22)+'| Ask')
         while count < min(depth, len(bidarray), len(askarray)):
                 biditem = bidarray[count]
                 biditemprice = float(biditem[0])
@@ -184,8 +185,8 @@ while True:
                                 biditemtime = ''
                                 askitemtime = ''
                 else:
-                        biditemoffset = ' '+str(biditemoffset)
-                        askitemoffset = ' '+str(askitemoffset)
+                        biditemoffset = ' '+str(biditemoffset).ljust(widthoffset)
+                        askitemoffset = ' '+str(askitemoffset).ljust(widthoffset)
                 print(str(biditemprice).ljust(widthprice), str('('+str(biditemsize)+')').ljust(widthsize+2)+biditemoffset+biditemdate+biditemtime+' | '+str(askitemprice).ljust(widthprice), str('('+str(askitemsize)+')').ljust(widthsize+2)+askitemoffset+askitemdate+askitemtime, end = '\r')
                 if sys.argv[-1] != 'noansi' and fcreatedat != 0:
                         if biditemprice == float(fprice):
