@@ -54,6 +54,8 @@ while ciso8601.parse_datetime(stop_timestamp) > ciso8601.parse_datetime(start_ti
         for fill in get_fills_results['fills']:
                 if ciso8601.parse_datetime(fill['createdAt']) > ciso8601.parse_datetime(start_timestamp):
                         list_of_fills.append(fill)
+        if len(get_fills_results['fills']) < 100:
+                break
         stop_timestamp = ciso8601.parse_datetime(get_fills_results['fills'][-1]['createdAt']) + datetime.timedelta(microseconds = 1000)
         stop_timestamp = stop_timestamp.isoformat()[:-9] + 'Z'
 list_of_fills_unique = [ ]
