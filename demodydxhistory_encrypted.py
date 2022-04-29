@@ -99,7 +99,7 @@ for fill in list_of_fills:
                       fill['id']+','+
                       fill['liquidity']+','+
                       fill['market']+','+
-                      fill['orderId']+','+
+                      str(fill['orderId'])+','+
                       fill['price']+','+
                       fill['side']+','+
                       fill['size']+','+
