@@ -77,13 +77,21 @@ while True:
         try:
                 trades = api_data['contents']['trades'][0]
                 tradecreatedat = trades['createdAt']
+                tradeliquidation = trades['liquidation']
                 tradeprice = trades['price']
                 tradeside = trades['side']
                 tradesize = trades['size']
+                if tradeliquidation == True:
+                        liquidationstring = 'L'
+                        fp = open(ramdiskpath+'/'+market+'/liquidations', "a")
+                        fp.write(tradecreatedat+' '+tradeprice+' '+tradeside+' ('+tradesize+')L\n')
+                        fp.close()
+                else:
+                        liquidationstring = ''
                 fp = open(ramdiskpath+'/'+market+'/lasttrade', "w")
-                fp.write(tradecreatedat+' '+tradeprice+' '+tradeside+' ('+tradesize+')\n')
+                fp.write(tradecreatedat+' '+tradeprice+' '+tradeside+' ('+tradesize+')'+liquidationstring+'\n')
                 fp.close()
-                logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' '+tradecreatedat+' '+tradeprice+' '+tradeside.ljust(4)+' ('+tradesize+')')
+                logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' '+tradecreatedat+' '+tradeprice+' '+tradeside.ljust(4)+' ('+tradesize+')'+liquidationstring)
                 checkwidth('tradeprice', len(tradeprice))
                 checkwidth('tradesize', len(tradesize))
                 api_data = ws.recv()
