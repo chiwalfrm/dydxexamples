@@ -154,6 +154,10 @@ while True:
                 ws.close()
                 time.sleep(1)
                 try:
+                        os.system('rmdir -r '+ramdiskpath+'/'+market+'/asks')
+                        os.system('rmdir -r '+ramdiskpath+'/'+market+'/bids')
+                        os.system('mkdir -p '+ramdiskpath+'/'+market+'/asks')
+                        os.system('mkdir -p '+ramdiskpath+'/'+market+'/bids')
                         openconnection()
                 except Exception as error:
                         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
