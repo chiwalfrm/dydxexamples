@@ -108,7 +108,7 @@ then
         TMPFOLDER=/Volumes/epochdisk
 else
         sudo mkdir -p /mnt/epochdisk
-        sudo mount -t tmpfs -o rw,size=512M tmpfs /mnt/epochdisk
+        sudo mount -t tmpfs -o rw,size=1024M tmpfs /mnt/epochdisk
         sudo chmod 777 /mnt/epochdisk
         TMPFOLDER=/mnt/epochdisk
 fi
