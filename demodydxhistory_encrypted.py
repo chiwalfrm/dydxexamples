@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet
 from dydx3 import Client
 from dydx3 import constants
+from os import path
 import base64
 import ciso8601
 import datetime
@@ -15,10 +16,10 @@ _api_secret_encrypted = '<FILL_THIS_OUT>'
 _api_passphrase_encrypted = '<FILL_THIS_OUT>'
 _stark_private_key_encrypted = '<FILL_THIS_OUT>'
 _eth_address_encrypted = '<FILL_THIS_OUT>'
-_network_id = str(constants.NETWORK_ID_ROPSTEN)
-#_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_ROPSTEN)
-_api_host = constants.API_HOST_ROPSTEN
-#_api_host is set to either constants.API_HOST_MAINNET or constants.API_HOST_ROPSTEN
+_network_id = str(constants.NETWORK_ID_GOERLI)
+#_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
+_api_host = constants.API_HOST_GOERLI
+#_api_host is set to either constants.API_HOST_MAINNET or constants.API_HOST_GOERLI
 ##############################################################
 
 def encrypt(message: bytes, key: bytes) -> bytes:
@@ -26,6 +27,29 @@ def encrypt(message: bytes, key: bytes) -> bytes:
 
 def decrypt(token: bytes, key: bytes) -> bytes:
         return Fernet(key).decrypt(token)
+
+if len(sys.argv) > 3:
+        if not path.exists(sys.argv[3]):
+                print('ERROR: File', sys.argv[3], 'does not exist.')
+                exit()
+        else:
+                exec(open(sys.argv[3]).read())
+                _private_key_encrypted = my_eth_private_key_encrypted
+                _api_key_encrypted = my_api_key_encrypted
+                _api_secret_encrypted = my_api_secret_encrypted
+                _api_passphrase_encrypted = my_api_passphrase_encrypted
+                _stark_private_key_encrypted = my_stark_private_key_encrypted
+                _eth_address_encrypted = my_eth_address_encrypted
+                _network_id = my_api_network_id
+else:
+        my_api_network_id = _network_id
+if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
+        my_api_host = constants.API_HOST_MAINNET
+elif my_api_network_id == str(constants.NETWORK_ID_GOERLI):
+        my_api_host = constants.API_HOST_GOERLI
+else:
+        print('Error: my_api_network_id is not '+str(constants.NETWORK_ID_MAINNET)+' or '+str(constants.NETWORK_ID_GOERLI)+'.')
+        exit()
 
 print("Enter decryption key (type 'encrypt' to encrypt): ", end = '')
 decryptionkey = input()
@@ -45,8 +69,9 @@ if decryptionkey == 'encrypt':
                 encryptedmessage = encrypt(encryptstring.encode(), encryptkey)
                 print(base64.b64encode(encryptedmessage))
 _eth_address = decrypt(base64.b64decode(_eth_address_encrypted), decryptionkey).decode()
+_api_host = my_api_host
 
-if _private_key != '':
+if _private_key_encrypted != '':
         _private_key = decrypt(base64.b64decode(_private_key_encrypted), decryptionkey).decode()
         client = Client(
                 host = _api_host,
@@ -83,6 +108,12 @@ list_of_fills = [ ]
 while ciso8601.parse_datetime(stop_timestamp) > ciso8601.parse_datetime(start_timestamp):
         get_fills_results = client.private.get_fills(created_before_or_at = stop_timestamp)
         get_fills_results = get_fills_results.data
+        firstrecorddate = get_fills_results['fills'][0]['createdAt']
+        lastrecorddate  = get_fills_results['fills'][-1]['createdAt']
+        if firstrecorddate == lastrecorddate:
+                print('You have more than 100 trades in the same millisecond:', firstrecorddate)
+                print('Please contact customer service for further assistance.')
+                exit()
         for fill in get_fills_results['fills']:
                 if ciso8601.parse_datetime(fill['createdAt']) > ciso8601.parse_datetime(start_timestamp):
                         list_of_fills.append(fill)
