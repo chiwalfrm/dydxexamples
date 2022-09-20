@@ -14,7 +14,7 @@ def createwithdrawalpart2():
         if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
                 w3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/' + infurakey))
         else:
-                w3 = Web3(Web3.HTTPProvider('https://ropsten.infura.io/v3/' + infurakey))
+                w3 = Web3(Web3.HTTPProvider('https://goerli.infura.io/v3/' + infurakey))
         stark_public_key_2, stark_public_key_y_coordinate_2 = private_key_to_public_key_pair_hex(client.stark_private_key)
         assettype = constants.COLLATERAL_ASSET_ID_BY_NETWORK_ID.get(int(my_api_network_id))
         dydxabi = requests.get(url = 'https://raw.githubusercontent.com/dydxprotocol/dydx-v3-python/master/dydx3/abi/starkware-perpetuals.json').json()
