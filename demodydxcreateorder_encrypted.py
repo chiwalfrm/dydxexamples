@@ -14,10 +14,10 @@ _api_secret_encrypted = '<FILL_THIS_OUT>'
 _api_passphrase_encrypted = '<FILL_THIS_OUT>'
 _stark_private_key_encrypted = '<FILL_THIS_OUT>'
 _eth_address_encrypted = '<FILL_THIS_OUT>'
-_network_id = str(constants.NETWORK_ID_ROPSTEN)
-#_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_ROPSTEN)
-_api_host = constants.API_HOST_ROPSTEN
-#_api_host is set to either constants.API_HOST_MAINNET or constants.API_HOST_ROPSTEN
+_network_id = str(constants.NETWORK_ID_GOERLI)
+#_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
+_api_host = constants.API_HOST_GOERLI
+#_api_host is set to either constants.API_HOST_MAINNET or constants.API_HOST_GOERLI
 ##############################################################
 
 def encrypt(message: bytes, key: bytes) -> bytes:
@@ -53,7 +53,8 @@ if _private_key != '':
                 eth_private_key = _private_key,
                 network_id = _network_id
         )
-        stark_private_key = client.onboarding.derive_stark_key()
+        derive_stark_key_result = client.onboarding.derive_stark_key()
+        stark_private_key = derive_stark_key_result['private_key']
         client.stark_private_key = stark_private_key
 else:
         _api_key = decrypt(base64.b64decode(_api_key_encrypted), decryptionkey).decode()
