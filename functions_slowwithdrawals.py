@@ -8,7 +8,7 @@ def createwithdrawal():
                 expiration = epoch_seconds_to_iso(time.time() + 604801)
         )
         print(create_withdrawal_result.data)
-...
+
 #my_api_network_id/infurakey/my_eth_address/my_eth_private_key (SET THESE)
 def createwithdrawalpart2():
         if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
@@ -33,7 +33,7 @@ def createwithdrawalpart2():
         print("Waiting for transaction to be confirmed...")
         txn_receipt = w3.eth.wait_for_transaction_receipt(txn_hash)
         print(txn_receipt)
-...
+
 #limitx = set this to number of records to retrieve (SET THIS)
 def checktransfers():
         get_transfers_result = client.private.get_transfers(limit = limitx)
