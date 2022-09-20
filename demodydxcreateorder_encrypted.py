@@ -26,10 +26,6 @@ def encrypt(message: bytes, key: bytes) -> bytes:
 def decrypt(token: bytes, key: bytes) -> bytes:
         return Fernet(key).decrypt(token)
 
-if _network_id == str(constants.NETWORK_ID_MAINNET) and checkblocked() != False:
-        print('Blocked')
-        exit()
-
 print("Enter decryption key (type 'encrypt' to encrypt): ", end = '')
 decryptionkey = input()
 if decryptionkey == 'encrypt':
