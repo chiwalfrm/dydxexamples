@@ -133,19 +133,21 @@ while True:
                 bids = api_data['contents']['bids']
                 offset = api_data['contents']['offset']
                 if asks != []:
-                        askprice = asks[0][0]
-                        asksize = asks[0][1]
-                        askoffset = offset
-                        checkaskfiles()
-                        checkwidth('price', len(askprice))
-                        checkwidth('size', len(asksize))
+                        for askitem in asks:
+                                askprice = askitem[0]
+                                askoffset = offset
+                                asksize = askitem[1]
+                                checkaskfiles()
+                                checkwidth('price', len(askprice))
+                                checkwidth('size', len(asksize))
                 if bids != []:
-                        bidprice = bids[0][0]
-                        bidsize = bids[0][1]
-                        bidoffset = offset
-                        checkbidfiles()
-                        checkwidth('price', len(bidprice))
-                        checkwidth('size', len(bidsize))
+                        for biditem in bids:
+                                bidprice = biditem[0]
+                                bidoffset = offset
+                                bidsize = biditem[1]
+                                checkbidfiles()
+                                checkwidth('price', len(bidprice))
+                                checkwidth('size', len(bidsize))
         except KeyboardInterrupt:
                 ws.close()
                 sys.exit(0)
