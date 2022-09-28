@@ -121,17 +121,24 @@ while True:
                         if fbidsize != '0':
                                 bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
         highestbidprice = 0
-        while highestbidprice == 0 or highestbidprice > lowestaskprice:
+        while highestbidprice == 0 or highestbidprice >= lowestaskprice:
                 highestbid = bidarray[0]
                 lowestask = askarray[0]
                 highestbidprice = float(highestbid[0])
                 lowestaskprice = float(lowestask[0])
+                highestbidsize = float(highestbid[1])
+                lowestasksize = float(lowestask[1])
                 highestbidoffset = int(highestbid[2])
                 lowestaskoffset = int(lowestask[2])
                 if highestbidoffset < lowestaskoffset:
                         bidarray.pop(0)
-                else:
+                elif highestbidoffset > lowestaskoffset:
                         askarray.pop(0)
+                else:
+                        if highestbidsize < lowestasksize:
+                                bidarray.pop(0)
+                        else:
+                                askarray.pop(0)
         count = 0
         highestoffset = 0
         bidsizetotal = 0
