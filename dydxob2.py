@@ -88,38 +88,34 @@ while True:
                 fcreatedat = 0
         askarray = []
         bidarray = []
-        os.system('ls '+ramdiskpath+'/'+market+'/asks | sort -n > '+ramdiskpath+'/'+market+'/lista'+str(pid))
-        os.system('ls '+ramdiskpath+'/'+market+'/bids | sort -n -r > '+ramdiskpath+'/'+market+'/listb'+str(pid))
-        with open(ramdiskpath+'/'+market+'/lista'+str(pid)) as fp:
-                for line in fp:
-                        line = line.strip('\n\r')
-                        fname = []
-                        while len(fname) != 4:
-                                fp2 = open(ramdiskpath+'/'+market+'/asks/'+line)
-                                line2 = fp2.readline()
-                                fname = line2.strip('\n\r').split(sep)
-                                fp2.close()
-                        faskoffset = fname[0]
-                        fasksize = fname[1]
-                        fdate = fname[2]
-                        ftime = fname[3]
-                        if fasksize != '0':
-                                askarray.append([line, fasksize, faskoffset, fdate, ftime])
-        with open(ramdiskpath+'/'+market+'/listb'+str(pid)) as fp:
-                for line in fp:
-                        line = line.strip('\n\r')
-                        fname = []
-                        while len(fname) != 4:
-                                fp2 = open(ramdiskpath+'/'+market+'/bids/'+line)
-                                line2 = fp2.readline()
-                                fname = line2.strip('\n\r').split(sep)
-                                fp2.close()
-                        fbidoffset = fname[0]
-                        fbidsize = fname[1]
-                        fdate = fname[2]
-                        ftime = fname[3]
-                        if fbidsize != '0':
-                                bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
+        askprices = os.popen('cd '+ramdiskpath+'/'+market+'/asks; grep "" /dev/null * | sed \'s/:/ /\' | grep -v \' 0 \' | sort -n').read()
+        askpriceslist = askprices.split("\n")
+        for askprice in askpriceslist:
+                if askprice != '':
+                        fname = askprice.split(sep)
+                        line = fname[0]
+                        faskoffset = fname[1]
+                        fasksize = fname[2]
+                        fdate = fname[3]
+                        ftime = fname[4]
+                        askarray.append([line, fasksize, faskoffset, fdate, ftime])
+        bidprices = os.popen('cd '+ramdiskpath+'/'+market+'/bids; grep "" /dev/null * | sed \'s/:/ /\' | grep -v \' 0 \' | sort -n -r').read()
+        bidpriceslist = bidprices.split("\n")
+        for bidprice in bidpriceslist:
+                if bidprice != '':
+                        fname = bidprice.split(sep)
+                        line = fname[0]
+                        fbidoffset = fname[1]
+                        fbidsize = fname[2]
+                        fdate = fname[3]
+                        ftime = fname[4]
+                        bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
+        if len(bidarray) == 0 or len(askarray) == 0:
+                fp = open(ramdiskpath+'/'+market+'/TRAPemptyarrays', "a")
+                fp.write(str(len(bidarray))+','+str(len(askarray))+','+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                fp.close()
+                time.sleep(1)
+                continue
         highestbidprice = 0
         while highestbidprice == 0 or highestbidprice >= lowestaskprice:
                 highestbid = bidarray[0]
@@ -130,17 +126,22 @@ while True:
                 lowestasksize = float(lowestask[1])
                 highestbidoffset = int(highestbid[2])
                 lowestaskoffset = int(lowestask[2])
-                if highestbidoffset < lowestaskoffset:
-                        bidarray.pop(0)
-                elif highestbidoffset > lowestaskoffset:
-                        askarray.pop(0)
-                else:
-                        if highestbidsize < lowestasksize:
+                if highestbidprice >= lowestaskprice:
+                        if highestbidoffset < lowestaskoffset:
                                 bidarray.pop(0)
-                        else:
+                        elif highestbidoffset > lowestaskoffset:
                                 askarray.pop(0)
+                        else:
+                                fp = open(ramdiskpath+'/'+market+'/TRAPsameoffset', "a")
+                                fp.write(str(highestbidprice)+','+str(lowestaskprice)+','+str(highestbidoffset)+','+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                                fp.close()
+                                if highestbidsize < lowestasksize:
+                                        bidarray.pop(0)
+                                else:
+                                        askarray.pop(0)
         count = 0
         highestoffset = 0
+        lowestoffset = 0
         bidsizetotal = 0
         asksizetotal = 0
         if len(sys.argv) > 3 and ( sys.argv[3] == 'compact' or sys.argv[3] == 'ultracompact' ):
