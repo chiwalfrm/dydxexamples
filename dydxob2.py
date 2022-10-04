@@ -93,31 +93,34 @@ while True:
         for askprice in askpriceslist:
                 if askprice != '':
                         fname = askprice.split(sep)
-                        line = fname[0]
-                        faskoffset = fname[1]
-                        fasksize = fname[2]
-                        fdate = fname[3]
-                        ftime = fname[4]
-                        askarray.append([line, fasksize, faskoffset, fdate, ftime])
+                        if len(fname) == 5:
+                                line = fname[0]
+                                faskoffset = fname[1]
+                                fasksize = fname[2]
+                                fdate = fname[3]
+                                ftime = fname[4]
+                                askarray.append([line, fasksize, faskoffset, fdate, ftime])
         bidprices = os.popen('cd '+ramdiskpath+'/'+market+'/bids; grep "" /dev/null * | sed \'s/:/ /\' | grep -v \' 0 \' | sort -n -r').read()
         bidpriceslist = bidprices.split("\n")
         for bidprice in bidpriceslist:
                 if bidprice != '':
                         fname = bidprice.split(sep)
-                        line = fname[0]
-                        fbidoffset = fname[1]
-                        fbidsize = fname[2]
-                        fdate = fname[3]
-                        ftime = fname[4]
-                        bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
+                        if len(fname) == 5:
+                                line = fname[0]
+                                fbidoffset = fname[1]
+                                fbidsize = fname[2]
+                                fdate = fname[3]
+                                ftime = fname[4]
+                                bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
         if len(bidarray) == 0 or len(askarray) == 0:
                 fp = open(ramdiskpath+'/'+market+'/TRAPemptyarrays', "a")
-                fp.write(str(len(bidarray))+','+str(len(askarray))+','+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                fp.write(str(len(bidarray))+','+str(len(askarray))+',0,'+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                 fp.close()
                 time.sleep(1)
                 continue
         highestbidprice = 0
-        while highestbidprice == 0 or highestbidprice >= lowestaskprice:
+        lowestaskprice = 0
+        while len(bidarray) > 0 and len(askarray) > 0 and ( highestbidprice == 0 or highestbidprice >= lowestaskprice ):
                 highestbid = bidarray[0]
                 lowestask = askarray[0]
                 highestbidprice = float(highestbid[0])
@@ -139,6 +142,12 @@ while True:
                                         bidarray.pop(0)
                                 else:
                                         askarray.pop(0)
+        if len(bidarray) == 0 or len(askarray) == 0:
+                fp = open(ramdiskpath+'/'+market+'/TRAPemptyarrays', "a")
+                fp.write(str(len(bidarray))+','+str(len(askarray))+',1,'+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                fp.close()
+                time.sleep(1)
+                continue
         count = 0
         highestoffset = 0
         lowestoffset = 0
