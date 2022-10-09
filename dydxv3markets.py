@@ -85,7 +85,7 @@ elif platform == "darwin":
         # OS X
         ramdiskpath = '/Volumes/RAMDisk'
 
-handler = RotatingFileHandler(ramdiskpath+'/dydxv3markets.log', maxBytes=1048576,
+handler = RotatingFileHandler(ramdiskpath+'/dydxv3markets.log', maxBytes=2097152,
                               backupCount = 4)
 logger.addHandler(handler)
 
