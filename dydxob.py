@@ -20,9 +20,12 @@ def checkaskfiles():
                 faskoffset = fname[0]
                 fasksize = fname[1]
         if exists(ramdiskpath+'/'+market+'/asks/'+askprice) == False or askoffset > faskoffset:
-                fp = open(ramdiskpath+'/'+market+'/asks/'+askprice, "w")
-                fp.write(askoffset+' '+asksize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
-                fp.close()
+                if asksize == '0':
+                        os.system('rm '+ramdiskpath+'/'+market+'/asks/'+askprice)
+                else:
+                        fp = open(ramdiskpath+'/'+market+'/asks/'+askprice, "w")
+                        fp.write(askoffset+' '+asksize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                        fp.close()
                 logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/asks/'+askprice+': '+str('('+asksize+')').ljust(10)+' '+askoffset)
 
 def checkbidfiles():
@@ -34,9 +37,12 @@ def checkbidfiles():
                 fbidoffset = fname[0]
                 fbidsize = fname[1]
         if exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == False or bidoffset > fbidoffset:
-                fp = open(ramdiskpath+'/'+market+'/bids/'+bidprice, "w")
-                fp.write(bidoffset+' '+bidsize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
-                fp.close()
+                if bidsize == '0':
+                        os.system('rm '+ramdiskpath+'/'+market+'/bids/'+bidprice)
+                else:
+                        fp = open(ramdiskpath+'/'+market+'/bids/'+bidprice, "w")
+                        fp.write(bidoffset+' '+bidsize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                        fp.close()
                 logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/bids/'+bidprice+': '+str('('+bidsize+')').ljust(10)+' '+bidoffset)
 
 def openconnection():
@@ -108,7 +114,7 @@ if len(sys.argv) < 2:
         market = 'BTC-USD'
 else:
         market = sys.argv[1]
-handler = RotatingFileHandler(ramdiskpath+'/dydxob'+market+'.log', maxBytes=1048576,
+handler = RotatingFileHandler(ramdiskpath+'/dydxob'+market+'.log', maxBytes=2097152,
                               backupCount = 4)
 logger.addHandler(handler)
 
