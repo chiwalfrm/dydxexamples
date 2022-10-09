@@ -29,7 +29,6 @@ REDWHITE = '\033[0;31m\u001b[47m'
 GREENWHITE = '\033[0;32m\u001b[47m'
 
 def handler(signum, frame):
-        cleanup()
         exit()
 
 def checkmarketdata(file):
@@ -46,10 +45,6 @@ def checkmarketdata(file):
                 else:
                         element1 = ' '+fname[1]+' '+fname[2]
                 print(file.ljust(15)+':', element0[:widthmarketstats].ljust(widthmarketstats)+element1)
-
-def cleanup():
-        os.system('rm '+ramdiskpath+'/'+market+'/lista'+str(pid))
-        os.system('rm '+ramdiskpath+'/'+market+'/listb'+str(pid))
 
 pp = pprint.PrettyPrinter(width = 41, compact = True)
 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxob2.py')
@@ -88,7 +83,7 @@ while True:
                 fcreatedat = 0
         askarray = []
         bidarray = []
-        askprices = os.popen('cd '+ramdiskpath+'/'+market+'/asks; grep "" /dev/null * | sed \'s/:/ /\' | grep -v \' 0 \' | sort -n').read()
+        askprices = os.popen('cd '+ramdiskpath+'/'+market+'/asks; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n').read()
         askpriceslist = askprices.split("\n")
         for askprice in askpriceslist:
                 if askprice != '':
@@ -100,7 +95,7 @@ while True:
                                 fdate = fname[3]
                                 ftime = fname[4]
                                 askarray.append([line, fasksize, faskoffset, fdate, ftime])
-        bidprices = os.popen('cd '+ramdiskpath+'/'+market+'/bids; grep "" /dev/null * | sed \'s/:/ /\' | grep -v \' 0 \' | sort -n -r').read()
+        bidprices = os.popen('cd '+ramdiskpath+'/'+market+'/bids; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n -r').read()
         bidpriceslist = bidprices.split("\n")
         for bidprice in bidpriceslist:
                 if bidprice != '':
@@ -228,7 +223,6 @@ while True:
         checkmarketdata('volume24H')
         if exists(ramdiskpath+'/'+market+'/EXITFLAG') == True:
                 os.system('rm '+ramdiskpath+'/'+market+'/EXITFLAG')
-                cleanup()
                 exit()
         else:
                 time.sleep(1)
