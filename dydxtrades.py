@@ -58,7 +58,7 @@ if len(sys.argv) < 2:
         market = 'BTC-USD'
 else:
         market = sys.argv[1]
-handler = RotatingFileHandler(ramdiskpath+'/dydxtrades'+market+'.log', maxBytes=1048576,
+handler = RotatingFileHandler(ramdiskpath+'/dydxtrades'+market+'.log', maxBytes=2097152,
                               backupCount = 4)
 logger.addHandler(handler)
 
