@@ -1,6 +1,6 @@
 #!/bin/sh
 
-baseurl=http://lawrencedydx.freeddns.org:8080
+baseurl=https://chiwalfrm.github.io
 
 cleanup ()
 {
@@ -80,9 +80,49 @@ update_rewards_for_account ()
                 fi
                 f1=`/usr/bin/printf "%'f" \`echo "$rewards - $lastrewards" | bc -l\``
                 f2=`/usr/bin/printf "%'f" $rewards`
-                /usr/bin/printf "Epoch%s   %35s %35s\n" $fstartingepoch $f1 $f2
+                if [ $fstartingepoch -lt 10 ]
+                then
+                        /usr/bin/printf "Epoch%s %37s %35s\n" $fstartingepoch $f1 $f2
+                elif [ $fstartingepoch -lt 100 ]
+                then
+                        /usr/bin/printf "Epoch%s %36s %35s\n" $fstartingepoch $f1 $f2
+                fi
                 lastrewards=$rewards
                 fstartingepoch=$((fstartingepoch+1))
+        done
+}
+
+create_epoch_html ()
+{
+        cd output
+        count=0
+        while [ "$count" -le "$lastepoch" ]
+        do
+                if [ -f epoch$count.html ]
+                then
+                        echo "Epoch$count already done (skipped)"
+                else
+                        for s1 in `ls | grep ^0x`
+                        do
+                                echo $s1 `grep "^Epoch$count " $s1`
+                        done | grep " Epoch[0-9]" | awk '{print $1" "$3}' | grep -v ' 0.000000$' | tr -d , | sort -k 2 -n -r > epoch$count.txt
+                        cat << EOF > epoch$count.html
+<!DOCTYPE html PUBLIC"ISO/IEC 15445:2000//DTD HTML//EN"><html><head><title>title</title></head><body>
+<p style="font-family:'Courier New'">
+`wc -l epoch$count.txt | awk '{print $1}'` addresses loaded<br>
+Updated at `date`<br>
+EOF
+                        count2=1
+                        awk '{print $1}' epoch$count.txt | while read l1
+                        do
+                                echo "`grep $l1 whalelist.html | sed 's|<br>$||'` (#$count2)<br>" >> epoch$count.html
+                                count2=$((count2+1))
+                        done
+                        echo '</body></html>' >> epoch$count.html
+                        echo "Epoch$count done"
+                        rm epoch$count.txt
+                fi
+                count=$((count+1))
         done
 }
 
@@ -142,23 +182,28 @@ do
         count=$((count+1))
 done
 echo "STAGE  5 Generating address lists..."
-cat $TMPFOLDER/update_rewards$$/epoch$lastepoch.col1 | tr "[A-Z]" "[a-z]" > epochaccounts_sorted_alpha.txt
 sort -n -r +1 epoch$lastepoch.txt | awk '{print $1}' | tr "[A-Z]" "[a-z]" > epochaccounts_sorted_rewards.txt
 echo "STAGE  6 Generating/updating trading reports..."
-totaladdresses=`wc -l epochaccounts_sorted_alpha.txt | awk '{print $1}'`
-cat <<EOF > $TMPFOLDER/update_rewards$$/output/fulllist.html
+totaladdresses=`wc -l epochaccounts_sorted_rewards.txt | awk '{print $1}'`
+cat <<EOF > $TMPFOLDER/update_rewards$$/output/whalelist.html
 <!DOCTYPE html PUBLIC"ISO/IEC 15445:2000//DTD HTML//EN"><html><head><title>title</title></head><body>
 <p style="font-family:'Courier New'">
 $totaladdresses addresses loaded<br>
 Updated at `date` (Epoch $lastepoch)<br>
+See Leaderboard for:<br>
 EOF
-cp $TMPFOLDER/update_rewards$$/output/fulllist.html $TMPFOLDER/update_rewards$$/output/whalelist.html
+count=0
+while [ "$count" -le "$lastepoch" ]
+do
+        echo "<a href=\"$baseurl/epoch$count.html\">Epoch$count</a><br>"
+        count=$((count+1))
+done >> $TMPFOLDER/update_rewards$$/output/whalelist.html
 echo "STAGE  7 Generating parallel workloads..."
 if [ "`uname`" = "Darwin" ]
 then
-        split -l $((totaladdresses/parallel)) epochaccounts_sorted_alpha.txt $TMPFOLDER/update_rewards$$/x
+        split -l $((totaladdresses/parallel)) epochaccounts_sorted_rewards.txt $TMPFOLDER/update_rewards$$/x
 else
-        split -n l/$parallel epochaccounts_sorted_alpha.txt $TMPFOLDER/update_rewards$$/x
+        split -n l/$parallel epochaccounts_sorted_rewards.txt $TMPFOLDER/update_rewards$$/x
 fi
 echo "STAGE  8 Executing parallel jobs..."
 for xfile in `cd $TMPFOLDER/update_rewards$$; ls x??`
@@ -167,7 +212,7 @@ do
         totalsubaddresses=`wc -l $TMPFOLDER/update_rewards$$/$xfile | awk '{print $1}'`
         for account in `cat $TMPFOLDER/update_rewards$$/$xfile`
         do
-                update_rewards_for_account $account >> $TMPFOLDER/update_rewards$$/output/$account
+                update_rewards_for_account $account >> $TMPFOLDER/update_rewards$$/output/$account.txt
                 echo "FILEUPDATE $account $count / $totalsubaddresses"
                 count=$((count+1))
         done > $TMPFOLDER/update_rewards$$/$xfile.stdout 2> $TMPFOLDER/update_rewards$$/$xfile.stderr &
@@ -175,14 +220,7 @@ done
 count=1
 for account in `cat epochaccounts_sorted_rewards.txt`
 do
-        echo "<a href=\"$baseurl/$account\">$account</a> #$count<br>" >> $TMPFOLDER/update_rewards$$/output/fulllist.html
-        echo "FULLLIST $account $count / $totaladdresses"
-        count=$((count+1))
-done > $TMPFOLDER/update_rewards$$/fulllist.stdout 2> $TMPFOLDER/update_rewards$$/fulllist.stderr &
-count=1
-for account in `cat epochaccounts_sorted_rewards.txt`
-do
-        echo "<a href=\"$baseurl/$account\">$account</a> #$count<br>" >> $TMPFOLDER/update_rewards$$/output/whalelist.html
+        echo "<a href=\"$baseurl/$account.txt\">$account</a> #$count<br>" >> $TMPFOLDER/update_rewards$$/output/whalelist.html
         echo "WHALELIST $account $count / $totaladdresses"
         count=$((count+1))
 done > $TMPFOLDER/update_rewards$$/whalelist.stdout 2> $TMPFOLDER/update_rewards$$/whalelist.stderr &
@@ -190,10 +228,12 @@ echo "STAGE  9 Waiting for completion of jobs..."
 wait
 cat $TMPFOLDER/update_rewards$$/*.stderr
 echo "STAGE 10 Finalizing..."
-echo "</body></html>" >> $TMPFOLDER/update_rewards$$/output/fulllist.html
 echo "</body></html>" >> $TMPFOLDER/update_rewards$$/output/whalelist.html
 WORKINGDIR=`pwd`
-cd $TMPFOLDER/update_rewards$$/output && find . -newer $TMPFOLDER/update_rewards$$/xaa -type f -print0 | xargs -0 tar cf - | ( cd "$WORKINGDIR"/output && tar xf - )
+cd $TMPFOLDER/update_rewards$$/output && find . -newer $TMPFOLDER/update_rewards$$/xaa -type f -print0 | tar --null -T - -c | ( cd "$WORKINGDIR"/output && tar xf - )
 cd "$WORKINGDIR"
+echo "STAGE 11 Creating Epoch Leaderboards..."
+create_epoch_html
+echo "STAGE 12 Cleaning up..."
 cleanup
-echo "STAGE 11 Complete"
+echo "STAGE 13 Complete"
