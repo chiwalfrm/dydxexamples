@@ -1,0 +1,3 @@
+BTC-USD
+ETH-USD
+#this is a comment
