@@ -12,6 +12,7 @@ from sys import platform
 from websocket import create_connection
 
 def checkaskfiles():
+        global zeroaskoffset
         if exists(ramdiskpath+'/'+market+'/asks/'+askprice) == True:
                 fp = open(ramdiskpath+'/'+market+'/asks/'+askprice)
                 line = fp.readline()
@@ -19,9 +20,13 @@ def checkaskfiles():
                 fp.close()
                 faskoffset = fname[0]
                 fasksize = fname[1]
-        if exists(ramdiskpath+'/'+market+'/asks/'+askprice) == False or askoffset > faskoffset:
+        else:
+                faskoffset = 0
+        if ( exists(ramdiskpath+'/'+market+'/asks/'+askprice) == False and int(askoffset) > zeroaskoffset ) or int(askoffset) > int(faskoffset):
                 if asksize == '0':
-                        os.system('rm '+ramdiskpath+'/'+market+'/asks/'+askprice)
+                        if exists(ramdiskpath+'/'+market+'/asks/'+askprice) == True:
+                                os.remove(ramdiskpath+'/'+market+'/asks/'+askprice)
+                                zeroaskoffset = int(askoffset)
                 else:
                         fp = open(ramdiskpath+'/'+market+'/asks/'+askprice, "w")
                         fp.write(askoffset+' '+asksize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
@@ -29,6 +34,7 @@ def checkaskfiles():
                 logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/asks/'+askprice+': '+str('('+asksize+')').ljust(10)+' '+askoffset)
 
 def checkbidfiles():
+        global zerobidoffset
         if exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == True:
                 fp = open(ramdiskpath+'/'+market+'/bids/'+bidprice)
                 line = fp.readline()
@@ -36,9 +42,13 @@ def checkbidfiles():
                 fp.close()
                 fbidoffset = fname[0]
                 fbidsize = fname[1]
-        if exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == False or bidoffset > fbidoffset:
+        else:
+                fbidoffset = 0
+        if ( exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == False and int(bidoffset) > zerobidoffset ) or int(bidoffset) > int(fbidoffset):
                 if bidsize == '0':
-                        os.system('rm '+ramdiskpath+'/'+market+'/bids/'+bidprice)
+                        if exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == True:
+                                os.remove(ramdiskpath+'/'+market+'/bids/'+bidprice)
+                                zerobidoffset = int(bidoffset)
                 else:
                         fp = open(ramdiskpath+'/'+market+'/bids/'+bidprice, "w")
                         fp.write(bidoffset+' '+bidsize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
@@ -130,6 +140,8 @@ if exists(ramdiskpath+'/'+market+'/bids') == False:
 
 maxwidthprice = 0
 maxwidthsize = 0
+zeroaskoffset = 0
+zerobidoffset = 0
 openconnection()
 while True:
         try:
