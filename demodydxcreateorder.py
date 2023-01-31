@@ -21,7 +21,7 @@ my_network_id = str(constants.NETWORK_ID_GOERLI)
 ##############################################################
 
 if len(sys.argv) > 1 and path.exists(sys.argv[1]):
-                exec(open(sys.argv[1]).read())
+        exec(open(sys.argv[1]).read())
 if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
         my_api_host = constants.API_HOST_MAINNET
         my_ws_host = constants.WS_HOST_MAINNET
