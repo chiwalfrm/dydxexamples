@@ -1,13 +1,13 @@
+import datetime
+import requests
+from base64 import b64decode
 from cryptography.fernet import Fernet
 from dydx3 import Client
 from dydx3 import constants
 from dydx3 import epoch_seconds_to_iso
 from os import path
-import base64
-import datetime
-import requests
-import sys
-import time
+from sys import argv
+from time import time
 
 ########################## YOU FILL THIS OUT #################
 my_eth_private_key_encrypted = '<FILL_THIS_OUT>'
@@ -28,8 +28,8 @@ def encrypt(message: bytes, key: bytes) -> bytes:
 def decrypt(token: bytes, key: bytes) -> bytes:
         return Fernet(key).decrypt(token)
 
-if path.exists(sys.argv[1]):
-        exec(open(sys.argv[1]).read())
+if path.exists(argv[1]):
+        exec(open(argv[1]).read())
 if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
         my_api_host = constants.API_HOST_MAINNET
         my_ws_host = constants.WS_HOST_MAINNET
@@ -56,11 +56,11 @@ if decryptionkey == 'encrypt':
                         print()
                         exit()
                 encryptedmessage = encrypt(encryptstring.encode(), encryptkey)
-                print(base64.b64encode(encryptedmessage))
-my_eth_address = decrypt(base64.b64decode(my_eth_address_encrypted), decryptionkey).decode()
+                print(b64encode(encryptedmessage))
+my_eth_address = decrypt(b64decode(my_eth_address_encrypted), decryptionkey).decode()
 
 if my_eth_private_key_encrypted != '':
-        my_eth_private_key = decrypt(base64.b64decode(my_eth_private_key_encrypted), decryptionkey).decode()
+        my_eth_private_key = decrypt(b64decode(my_eth_private_key_encrypted), decryptionkey).decode()
         client = Client(
                 host = my_api_host,
                 default_ethereum_address = my_eth_address,
@@ -71,10 +71,10 @@ if my_eth_private_key_encrypted != '':
         stark_private_key = derive_stark_key_result['private_key']
         client.stark_private_key = stark_private_key
 else:
-        my_api_key = decrypt(base64.b64decode(my_api_key_encrypted), decryptionkey).decode()
-        my_api_secret = decrypt(base64.b64decode(my_api_secret_encrypted), decryptionkey).decode()
-        my_api_passphrase = decrypt(base64.b64decode(my_api_passphrase_encrypted), decryptionkey).decode()
-        my_stark_private_key = decrypt(base64.b64decode(my_stark_private_key_encrypted), decryptionkey).decode()
+        my_api_key = decrypt(b64decode(my_api_key_encrypted), decryptionkey).decode()
+        my_api_secret = decrypt(b64decode(my_api_secret_encrypted), decryptionkey).decode()
+        my_api_passphrase = decrypt(b64decode(my_api_passphrase_encrypted), decryptionkey).decode()
+        my_stark_private_key = decrypt(b64decode(my_stark_private_key_encrypted), decryptionkey).decode()
         client = Client(
                 host = my_api_host,
                 network_id = my_api_network_id,
@@ -90,7 +90,7 @@ get_account_result = client.private.get_account(
         ethereum_address = my_eth_address
 )
 account = get_account_result.data['account']
-one_minute_from_now_iso = epoch_seconds_to_iso(time.time() + 70)
+one_minute_from_now_iso = epoch_seconds_to_iso(time() + 70)
 create_order_result = client.private.create_order(
         position_id = account['positionId'],
         market = constants.MARKET_BTC_USD,
