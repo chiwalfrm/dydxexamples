@@ -1,19 +1,17 @@
-import datetime
 import json
 import logging
 import os
-import pprint
-import random
 import sys
 import time
-from logging.handlers import RotatingFileHandler
-from os.path import exists
-from sys import platform
+from datetime import datetime
+from logging import handlers
+from pprint import PrettyPrinter
+from random import randint
 from websocket import create_connection
 
 def checkaskfiles():
         global zeroaskoffset
-        if exists(ramdiskpath+'/'+market+'/asks/'+askprice) == True:
+        if os.path.exists(ramdiskpath+'/'+market+'/asks/'+askprice) == True:
                 fp = open(ramdiskpath+'/'+market+'/asks/'+askprice)
                 line = fp.readline()
                 fname = line.strip('\n\r').split(sep)
@@ -22,20 +20,20 @@ def checkaskfiles():
                 fasksize = fname[1]
         else:
                 faskoffset = 0
-        if ( exists(ramdiskpath+'/'+market+'/asks/'+askprice) == False and int(askoffset) > zeroaskoffset ) or int(askoffset) > int(faskoffset):
+        if ( os.path.exists(ramdiskpath+'/'+market+'/asks/'+askprice) == False and int(askoffset) > zeroaskoffset ) or int(askoffset) > int(faskoffset):
                 if asksize == '0':
-                        if exists(ramdiskpath+'/'+market+'/asks/'+askprice) == True:
+                        if os.path.exists(ramdiskpath+'/'+market+'/asks/'+askprice) == True:
                                 os.remove(ramdiskpath+'/'+market+'/asks/'+askprice)
                                 zeroaskoffset = int(askoffset)
                 else:
                         fp = open(ramdiskpath+'/'+market+'/asks/'+askprice, "w")
-                        fp.write(askoffset+' '+asksize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                        fp.write(askoffset+' '+asksize+' '+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                         fp.close()
-                logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/asks/'+askprice+': '+str('('+asksize+')').ljust(10)+' '+askoffset)
+                logger.info(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/asks/'+askprice+': '+str('('+asksize+')').ljust(10)+' '+askoffset)
 
 def checkbidfiles():
         global zerobidoffset
-        if exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == True:
+        if os.path.exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == True:
                 fp = open(ramdiskpath+'/'+market+'/bids/'+bidprice)
                 line = fp.readline()
                 fname = line.strip('\n\r').split(sep)
@@ -44,16 +42,16 @@ def checkbidfiles():
                 fbidsize = fname[1]
         else:
                 fbidoffset = 0
-        if ( exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == False and int(bidoffset) > zerobidoffset ) or int(bidoffset) > int(fbidoffset):
+        if ( os.path.exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == False and int(bidoffset) > zerobidoffset ) or int(bidoffset) > int(fbidoffset):
                 if bidsize == '0':
-                        if exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == True:
+                        if os.path.exists(ramdiskpath+'/'+market+'/bids/'+bidprice) == True:
                                 os.remove(ramdiskpath+'/'+market+'/bids/'+bidprice)
                                 zerobidoffset = int(bidoffset)
                 else:
                         fp = open(ramdiskpath+'/'+market+'/bids/'+bidprice, "w")
-                        fp.write(bidoffset+' '+bidsize+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                        fp.write(bidoffset+' '+bidsize+' '+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                         fp.close()
-                logger.info(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/bids/'+bidprice+': '+str('('+bidsize+')').ljust(10)+' '+bidoffset)
+                logger.info(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' Updated '+ramdiskpath+'/'+market+'/bids/'+bidprice+': '+str('('+bidsize+')').ljust(10)+' '+bidoffset)
 
 def openconnection():
         global ws
@@ -108,14 +106,14 @@ def checkwidth(elementname, elementsize):
                 fp.close()
                 maxwidthsize = elementsize
 
-print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxob.py')
+print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxob.py')
 logger = logging.getLogger("Rotating Log")
 logger.setLevel(logging.INFO)
-pp = pprint.PrettyPrinter(width = 41, compact = True)
-if platform == "linux" or platform == "linux2":
+pp = PrettyPrinter(width = 41, compact = True)
+if sys.platform == "linux" or sys.platform == "linux2":
         # linux
         ramdiskpath = '/mnt/ramdisk'
-elif platform == "darwin":
+elif sys.platform == "darwin":
         # OS X
         ramdiskpath = '/Volumes/RAMDisk'
 sep = " "
@@ -124,18 +122,18 @@ if len(sys.argv) < 2:
         market = 'BTC-USD'
 else:
         market = sys.argv[1]
-handler = RotatingFileHandler(ramdiskpath+'/dydxob'+market+'.log', maxBytes=2097152,
+handler = logging.handlers.RotatingFileHandler(ramdiskpath+'/dydxob'+market+'.log', maxBytes=2097152,
                               backupCount = 4)
 logger.addHandler(handler)
 
-if exists(ramdiskpath) == False:
+if os.path.exists(ramdiskpath) == False:
         print('Error: Ramdisk', ramdiskpath, 'not mounted')
-        exit()
+        sys.exit()
 if os.path.ismount(ramdiskpath) == False:
         print('Warning:', ramdiskpath, 'is not a mount point')
-if exists(ramdiskpath+'/'+market+'/asks') == False:
+if os.path.exists(ramdiskpath+'/'+market+'/asks') == False:
         os.system('mkdir -p '+ramdiskpath+'/'+market+'/asks')
-if exists(ramdiskpath+'/'+market+'/bids') == False:
+if os.path.exists(ramdiskpath+'/'+market+'/bids') == False:
         os.system('mkdir -p '+ramdiskpath+'/'+market+'/bids')
 
 maxwidthprice = 0
@@ -170,7 +168,7 @@ while True:
                 ws.close()
                 sys.exit(0)
         except Exception as error:
-                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
+                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
                 ws.close()
                 time.sleep(1)
                 try:
@@ -180,6 +178,6 @@ while True:
                         os.system('mkdir -p '+ramdiskpath+'/'+market+'/bids')
                         openconnection()
                 except Exception as error:
-                        print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
+                        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
                         ws.close()
-                        time.sleep(random.randint(1,10))
+                        time.sleep(randint(1,10))
