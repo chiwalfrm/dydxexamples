@@ -1,21 +1,19 @@
-import datetime
 import os
-import pprint
 import signal
 import sys
 import time
-from os.path import exists
-from sys import platform
+from datetime import datetime
+from pprint import PrettyPrinter
 
 widthmarketstats = 24
 widthprice = 10
 widthsize = 10
 widthoffset = 11
 
-if platform == "linux" or platform == "linux2":
+if sys.platform == "linux" or sys.platform == "linux2":
         # linux
         ramdiskpath = '/mnt/ramdisk'
-elif platform == "darwin":
+elif sys.platform == "darwin":
         # OS X
         ramdiskpath = '/Volumes/RAMDisk'
 #Note: regular output needs 103 columns, compact 67, ultracompact 39
@@ -29,10 +27,10 @@ REDWHITE = '\033[0;31m\u001b[47m'
 GREENWHITE = '\033[0;32m\u001b[47m'
 
 def handler(signum, frame):
-        exit()
+        sys.exit()
 
 def checkmarketdata(file):
-        if exists(ramdiskpath+'/'+market+'/'+file) == True:
+        if os.path.exists(ramdiskpath+'/'+market+'/'+file) == True:
                 fname = []
                 while len(fname) != 3:
                         fp = open(ramdiskpath+'/'+market+'/'+file)
@@ -46,8 +44,8 @@ def checkmarketdata(file):
                         element1 = ' '+fname[1]+' '+fname[2]
                 print(file.ljust(15)+':', element0[:widthmarketstats].ljust(widthmarketstats)+element1)
 
-pp = pprint.PrettyPrinter(width = 41, compact = True)
-print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxob2.py')
+pp = PrettyPrinter(width = 41, compact = True)
+print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxob2.py')
 pid = os.getpid()
 sep = " "
 signal.signal(signal.SIGINT, handler)
@@ -59,16 +57,16 @@ if len(sys.argv) < 3:
         depth = 10
 else:
         depth = int(sys.argv[2])
-if exists(ramdiskpath+'/'+market+'/asks') == False:
+if os.path.exists(ramdiskpath+'/'+market+'/asks') == False:
         print('Error: Asks directory', ramdiskpath+'/'+market+'/asks', 'not found')
-        exit()
-if exists(ramdiskpath+'/'+market+'/bids') == False:
+        sys.exit()
+if os.path.exists(ramdiskpath+'/'+market+'/bids') == False:
         print('Error: Bids directory', ramdiskpath+'/'+market+'/bids', 'not found')
-        exit()
-if exists(ramdiskpath+'/'+market+'/lasttrade') == False:
+        sys.exit()
+if os.path.exists(ramdiskpath+'/'+market+'/lasttrade') == False:
         print('Warning: lasttrade file', ramdiskpath+'/'+market+'/lasttrade', 'not found')
 while True:
-        if exists(ramdiskpath+'/'+market+'/lasttrade') == True:
+        if os.path.exists(ramdiskpath+'/'+market+'/lasttrade') == True:
                 fname = []
                 while len(fname) != 4:
                         fp = open(ramdiskpath+'/'+market+'/lasttrade')
@@ -109,7 +107,7 @@ while True:
                                 bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
         if len(bidarray) == 0 or len(askarray) == 0:
                 fp = open(ramdiskpath+'/'+market+'/TRAPemptyarrays', "a")
-                fp.write(str(len(bidarray))+','+str(len(askarray))+',0,'+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                fp.write(str(len(bidarray))+','+str(len(askarray))+',0,'+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                 fp.close()
                 time.sleep(1)
                 continue
@@ -131,7 +129,7 @@ while True:
                                 askarray.pop(0)
                         else:
                                 fp = open(ramdiskpath+'/'+market+'/TRAPsameoffset', "a")
-                                fp.write(str(highestbidprice)+','+str(lowestaskprice)+','+str(highestbidoffset)+','+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                                fp.write(str(highestbidprice)+','+str(lowestaskprice)+','+str(highestbidoffset)+','+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                                 fp.close()
                                 if highestbidsize < lowestasksize:
                                         bidarray.pop(0)
@@ -139,7 +137,7 @@ while True:
                                         askarray.pop(0)
         if len(bidarray) == 0 or len(askarray) == 0:
                 fp = open(ramdiskpath+'/'+market+'/TRAPemptyarrays', "a")
-                fp.write(str(len(bidarray))+','+str(len(askarray))+',1,'+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                fp.write(str(len(bidarray))+','+str(len(askarray))+',1,'+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                 fp.close()
                 time.sleep(1)
                 continue
@@ -151,7 +149,7 @@ while True:
         if len(sys.argv) > 3 and ( sys.argv[3] == 'compact' or sys.argv[3] == 'ultracompact' ):
                 if sys.argv[3] == 'compact':
                         if fcreatedat != 0:
-                                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), fcreatedat, fprice, fside, fsize)
+                                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), fcreatedat, fprice, fside, fsize)
                         print('Bid'+' '.ljust(widthprice+widthsize+15)+'| Ask')
                 elif sys.argv[3] == 'ultracompact':
                         if fcreatedat != 0:
@@ -159,7 +157,7 @@ while True:
                         print('Bid'+' '.ljust(widthprice+widthsize+1)+'| Ask')
         else:
                 if fcreatedat != 0:
-                        print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Last trade:', fcreatedat, fprice, fside, fsize)
+                        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Last trade:', fcreatedat, fprice, fside, fsize)
                 print('Bid'+' '.ljust(widthprice+widthsize+widthoffset+22)+'| Ask')
         while count < min(depth, len(bidarray), len(askarray)):
                 biditem = bidarray[count]
@@ -221,8 +219,8 @@ while True:
         checkmarketdata('openInterest')
         checkmarketdata('trades24H')
         checkmarketdata('volume24H')
-        if exists(ramdiskpath+'/'+market+'/EXITFLAG') == True:
+        if os.path.exists(ramdiskpath+'/'+market+'/EXITFLAG') == True:
                 os.system('rm '+ramdiskpath+'/'+market+'/EXITFLAG')
-                exit()
+                sys.exit()
         else:
                 time.sleep(1)
