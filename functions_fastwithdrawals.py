@@ -21,7 +21,7 @@ def createfastwithdrawal_creditamount():
                 to_address = my_eth_address,
                 lp_position_id = lp_position_id_result,
                 lp_stark_public_key = list(get_fast_withdrawal_result.data['liquidityProviders'].values())[0]['starkKey'],
-                expiration = epoch_seconds_to_iso(time.time() + 604801)
+                expiration = epoch_seconds_to_iso(time() + 604801)
         )
         print(create_fast_withdrawal_result.data)
 
@@ -48,6 +48,6 @@ def createfastwithdrawal_debitamount():
                 to_address = my_eth_address,
                 lp_position_id = lp_position_id_result,
                 lp_stark_public_key = list(get_fast_withdrawal_result.data['liquidityProviders'].values())[0]['starkKey'],
-                expiration = epoch_seconds_to_iso(time.time() + 604801)
+                expiration = epoch_seconds_to_iso(time() + 604801)
         )
         print(create_fast_withdrawal_result.data)
