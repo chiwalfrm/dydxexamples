@@ -1,14 +1,12 @@
-import datetime
 import json
 import logging
 import os
-import pprint
-import random
 import sys
 import time
-from logging.handlers import RotatingFileHandler
-from os.path import exists
-from sys import platform
+from datetime import datetime
+from logging import handlers
+from pprint import PrettyPrinter
+from random import randint
 from websocket import create_connection
 
 def openconnection():
@@ -74,24 +72,24 @@ def checkwidth(elementname, elementsize):
                 fp.close()
                 maxwidthvolume24H = elementsize
 
-print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxv3markets.py')
+print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxv3markets.py')
 logger = logging.getLogger("Rotating Log")
 logger.setLevel(logging.INFO)
-pp = pprint.PrettyPrinter(width = 41, compact = True)
-if platform == "linux" or platform == "linux2":
+pp = PrettyPrinter(width = 41, compact = True)
+if sys.platform == "linux" or sys.platform == "linux2":
         # linux
         ramdiskpath = '/mnt/ramdisk'
-elif platform == "darwin":
+elif sys.platform == "darwin":
         # OS X
         ramdiskpath = '/Volumes/RAMDisk'
 
-handler = RotatingFileHandler(ramdiskpath+'/dydxv3markets.log', maxBytes=2097152,
+handler = logging.handlers.RotatingFileHandler(ramdiskpath+'/dydxv3markets.log', maxBytes=2097152,
                               backupCount = 4)
 logger.addHandler(handler)
 
-if exists(ramdiskpath) == False:
+if os.path.exists(ramdiskpath) == False:
         print('Error: Ramdisk', ramdiskpath, 'not mounted')
-        exit()
+        sys.exit()
 if os.path.ismount(ramdiskpath) == False:
         print('Warning:', ramdiskpath, 'is not a mount point')
 
@@ -108,30 +106,30 @@ while True:
         try:
                 api_data = ws.recv()
                 api_data = json.loads(api_data)
-                logger.info("{'timestamp': '"+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'}")
+                logger.info("{'timestamp': '"+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'}")
                 logger.info(api_data)
                 for item in api_data['contents'].items():
                         market = item[0]
                         marketdata = item[1]
-                        if exists(ramdiskpath+'/'+market) == False:
+                        if os.path.exists(ramdiskpath+'/'+market) == False:
                                 os.system('mkdir -p '+ramdiskpath+'/'+market)
                         for marketdata in marketdata.items():
                                 marketdataelement = marketdata[0]
                                 marketdatavalue = marketdata[1]
                                 fp = open(ramdiskpath+'/'+market+'/'+marketdataelement, "w")
-                                fp.write(marketdatavalue+' '+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                                fp.write(marketdatavalue+' '+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                                 fp.close()
                                 checkwidth(marketdataelement, len(marketdatavalue))
         except KeyboardInterrupt:
                 ws.close()
                 sys.exit(0)
         except Exception as error:
-                print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
+                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
                 ws.close()
                 time.sleep(1)
                 try:
                         openconnection()
                 except Exception as error:
-                        print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
+                        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "WebSocket message failed (%s)" % error)
                         ws.close()
-                        time.sleep(random.randint(1,10))
+                        time.sleep(randint(1,10))
