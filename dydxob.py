@@ -122,8 +122,10 @@ if len(sys.argv) < 2:
         market = 'BTC-USD'
 else:
         market = sys.argv[1]
-handler = logging.handlers.RotatingFileHandler(ramdiskpath+'/dydxob'+market+'.log', maxBytes=2097152,
-                              backupCount = 4)
+handler = logging.handlers.RotatingFileHandler(ramdiskpath+'/dydxob'+market+'.log',
+        maxBytes=2097152,
+        backupCount = 4
+)
 logger.addHandler(handler)
 
 if os.path.exists(ramdiskpath) == False:
