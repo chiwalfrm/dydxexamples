@@ -5,7 +5,7 @@ def createwithdrawal():
                 amount = withdrawalamount,
                 asset = constants.ASSET_USDC,
                 to_address = my_eth_address,
-                expiration = epoch_seconds_to_iso(time.time() + 604801)
+                expiration = epoch_seconds_to_iso(time() + 604801)
         )
         print(create_withdrawal_result.data)
 
