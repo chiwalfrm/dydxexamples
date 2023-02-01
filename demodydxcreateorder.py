@@ -1,11 +1,11 @@
+import datetime
+import requests
 from dydx3 import Client
 from dydx3 import constants
 from dydx3 import epoch_seconds_to_iso
 from os import path
-import datetime
-import requests
-import sys
-import time
+from sys import argv
+from time import time
 
 ########################## YOU FILL THIS OUT #################
 my_eth_private_key = '<FILL_THIS_OUT>'
@@ -20,8 +20,8 @@ my_api_network_id = str(constants.NETWORK_ID_GOERLI)
 #my_api_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
 ##############################################################
 
-if len(sys.argv) > 1 and path.exists(sys.argv[1]):
-        exec(open(sys.argv[1]).read())
+if len(argv) > 1 and path.exists(argv[1]):
+        exec(open(argv[1]).read())
 if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
         my_api_host = constants.API_HOST_MAINNET
         my_ws_host = constants.WS_HOST_MAINNET
@@ -58,7 +58,7 @@ get_account_result = client.private.get_account(
         ethereum_address = my_eth_address
 )
 account = get_account_result.data['account']
-one_minute_from_now_iso = epoch_seconds_to_iso(time.time() + 70)
+one_minute_from_now_iso = epoch_seconds_to_iso(time() + 70)
 create_order_result = client.private.create_order(
         position_id = account['positionId'],
         market = constants.MARKET_BTC_USD,
