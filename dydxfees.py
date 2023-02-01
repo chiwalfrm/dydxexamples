@@ -1,14 +1,14 @@
-import requests
 from dydx3 import Client
 from dydx3 import constants
+from requests import get
 
 client = Client(
         host = constants.API_HOST_MAINNET,
         network_id = constants.NETWORK_ID_MAINNET
 )
 
-#r = requests.get(url = 'https://api.stage.dydx.exchange/v3/markets')
-r = requests.get(url = 'https://api.dydx.exchange/v3/markets')
+#r = get(url = 'https://api.stage.dydx.exchange/v3/markets')
+r = get(url = 'https://api.dydx.exchange/v3/markets')
 r.raise_for_status()
 if r.status_code == 200:
         totalfees = 0
