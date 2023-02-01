@@ -2,9 +2,9 @@ from dydx3 import Client
 from dydx3 import constants
 from dydx3 import private_key_to_public_key_pair_hex
 from os import path
+from sys import argv
 import datetime
 import requests
-import sys
 
 ########################## YOU FILL THIS OUT #################
 my_eth_private_key = '<FILL_THIS_OUT>'
@@ -19,8 +19,8 @@ my_api_network_id = str(constants.NETWORK_ID_GOERLI)
 #my_api_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
 ##############################################################
 
-if len(sys.argv) > 1 and path.exists(sys.argv[1]):
-        exec(open(sys.argv[1]).read())
+if len(argv) > 1 and path.exists(argv[1]):
+        exec(open(argv[1]).read())
 if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
         my_api_host = constants.API_HOST_MAINNET
         my_ws_host = constants.WS_HOST_MAINNET
