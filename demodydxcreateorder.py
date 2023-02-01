@@ -16,8 +16,8 @@ my_api_secret = '<FILL_THIS_OUT>'
 my_api_passphrase = '<FILL_THIS_OUT>'
 my_stark_private_key = '<FILL_THIS_OUT>'
 my_eth_address = '<FILL_THIS_OUT>'
-my_network_id = str(constants.NETWORK_ID_GOERLI)
-#my_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
+my_api_network_id = str(constants.NETWORK_ID_GOERLI)
+#my_api_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
 ##############################################################
 
 if len(sys.argv) > 1 and path.exists(sys.argv[1]):
@@ -37,7 +37,7 @@ if my_eth_private_key != '':
                 host = my_api_host,
                 default_ethereum_address = my_eth_address,
                 eth_private_key = my_eth_private_key,
-                network_id = my_network_id
+                network_id = my_api_network_id
         )
         derive_stark_key_result = client.onboarding.derive_stark_key()
         stark_private_key = derive_stark_key_result['private_key']
@@ -45,7 +45,7 @@ if my_eth_private_key != '':
 else:
         client = Client(
                 host = my_api_host,
-                network_id = my_network_id,
+                network_id = my_api_network_id,
                 api_key_credentials = {
                         'key': my_api_key,
                         'secret': my_api_secret,
