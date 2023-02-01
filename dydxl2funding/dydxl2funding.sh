@@ -21,7 +21,15 @@ s8=0
 s9=0
 for s1 in $*
 do
-        python3 dydxl2funding.py $s1 | grep "'rate': " | cut -d \' -f 4 > $XDG_RUNTIME_DIR/dydxl2funding.out
+        market=`echo $s1 | cut -d : -f 1`
+        highlight=`echo $s1 | cut -d : -f 2`
+        if [ "$highlight" = 1 ]
+        then
+                backgroundcolor='\e[1;46m'
+        else
+                backgroundcolor=
+        fi
+        python3 dydxl2funding.py $market | grep "'rate': " | cut -d \' -f 4 > $XDG_RUNTIME_DIR/dydxl2funding.out
         s4=`head -1 $XDG_RUNTIME_DIR/dydxl2funding.out`
         for s5 in `head -8 $XDG_RUNTIME_DIR/dydxl2funding.out`
         do
@@ -31,7 +39,7 @@ do
         do
                 s8=`LC_NUMERIC=en_US.utf8 /usr/bin/printf "$s8 + %f\n" $s2 | bc`
         done
-        /usr/bin/printf "%-12s " $s1
+        /usr/bin/printf "${backgroundcolor}%-12s \e[0m" $market
         s10=`printf "%.0f\n" "\`LC_NUMERIC=en_US.utf8 /usr/bin/printf \"%f * 1000000\n\" $s4 | bc | sed 's/^-//'\`"`
         if [ "$s10" -gt "$i1" ]
         then
