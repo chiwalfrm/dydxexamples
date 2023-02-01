@@ -77,7 +77,7 @@ while parse_datetime(stop_timestamp) > parse_datetime(start_timestamp):
         get_fills_results = client.private.get_fills(created_before_or_at = stop_timestamp)
         get_fills_results = get_fills_results.data
         firstrecorddate = get_fills_results['fills'][0]['createdAt']
-        lastrecorddate  = get_fills_results['fills'][-1]['createdAt']
+        lastrecorddate = get_fills_results['fills'][-1]['createdAt']
         if firstrecorddate == lastrecorddate:
                 print('You have more than 100 trades in the same millisecond:', firstrecorddate)
                 print('Please contact customer service for further assistance.')
