@@ -14,10 +14,10 @@ if r.status_code == 200:
         totalfees = 0
         for key, value in r.json()['markets'].items():
                 market_statistics1 = client.public.get_stats(
-                        market=key,
-                        days=constants.MARKET_STATISTIC_DAY_ONE,
+                        market = key,
+                        days = constants.MARKET_STATISTIC_DAY_ONE,
                 )
-                fees=market_statistics1.data['markets'][key]['fees']
+                fees = market_statistics1.data['markets'][key]['fees']
                 totalfees = totalfees + float(fees)
                 print(key, fees)
 #               print(market_statistics.headers)
