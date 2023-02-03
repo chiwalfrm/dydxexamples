@@ -21,7 +21,13 @@ s8=0
 s9=0
 for s1 in $*
 do
-        market=`echo $s1 | cut -d : -f 1`
+        market = `echo $s1 | cut -d : -f 1`
+        python3 dydxl2funding.py $market | grep "'rate': " | cut -d \' -f 4 > $XDG_RUNTIME_DIR/dydxl2funding$market.out 2>&1 &
+done
+wait
+for s1 in $*
+do
+        market = `echo $s1 | cut -d : -f 1`
         highlight=`echo $s1 | cut -d : -f 2`
         if [ "$highlight" = 1 ]
         then
@@ -29,13 +35,12 @@ do
         else
                 backgroundcolor=
         fi
-        python3 dydxl2funding.py $market | grep "'rate': " | cut -d \' -f 4 > $XDG_RUNTIME_DIR/dydxl2funding.out
-        s4=`head -1 $XDG_RUNTIME_DIR/dydxl2funding.out`
-        for s5 in `head -8 $XDG_RUNTIME_DIR/dydxl2funding.out`
+        s4=`head -1 $XDG_RUNTIME_DIR/dydxl2funding$market.out`
+        for s5 in `head -8 $XDG_RUNTIME_DIR/dydxl2funding$market.out`
         do
                 s9=`LC_NUMERIC=en_US.utf8 /usr/bin/printf "$s9 + %f\n" $s5 | bc`
         done
-        for s2 in `head -24 $XDG_RUNTIME_DIR/dydxl2funding.out`
+        for s2 in `head -24 $XDG_RUNTIME_DIR/dydxl2funding$market.out`
         do
                 s8=`LC_NUMERIC=en_US.utf8 /usr/bin/printf "$s8 + %f\n" $s2 | bc`
         done
