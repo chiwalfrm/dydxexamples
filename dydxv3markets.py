@@ -84,7 +84,7 @@ elif sys.platform == "darwin":
         ramdiskpath = '/Volumes/RAMDisk'
 
 handler = logging.handlers.RotatingFileHandler(ramdiskpath+'/dydxv3markets.log',
-        maxBytes=2097152,
+        maxBytes = 2097152,
         backupCount = 4
 )
 logger.addHandler(handler)
