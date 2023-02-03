@@ -57,7 +57,7 @@ if len(sys.argv) < 2:
 else:
         market = sys.argv[1]
 handler = logging.handlers.RotatingFileHandler(ramdiskpath+'/dydxtrades'+market+'.log',
-        maxBytes=2097152,
+        maxBytes = 2097152,
         backupCount = 4
 )
 logger.addHandler(handler)
