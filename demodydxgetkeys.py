@@ -1,10 +1,11 @@
+from datetime import datetime
 from dydx3 import Client
 from dydx3 import constants
 from dydx3 import private_key_to_public_key_pair_hex
 from os import path
+from random import randint
+from requests import get
 from sys import argv
-import datetime
-import requests
 
 ########################## YOU FILL THIS OUT #################
 my_eth_private_key = '<FILL_THIS_OUT>'
