@@ -1,13 +1,14 @@
-import datetime
-import requests
-from base64 import b64decode
+import time
 from cryptography.fernet import Fernet
+from datetime import datetime
 from dydx3 import Client
 from dydx3 import constants
 from dydx3 import epoch_seconds_to_iso
+from base64 import b64decode
 from os import path
+from random import randint
+from requests import get
 from sys import argv
-from time import time
 
 ########################## YOU FILL THIS OUT #################
 my_eth_private_key_encrypted = '<FILL_THIS_OUT>'
@@ -90,7 +91,7 @@ get_account_result = client.private.get_account(
         ethereum_address = my_eth_address
 )
 account = get_account_result.data['account']
-one_minute_from_now_iso = epoch_seconds_to_iso(time() + 70)
+one_minute_from_now_iso = epoch_seconds_to_iso(time.time() + 70)
 create_order_result = client.private.create_order(
         position_id = account['positionId'],
         market = constants.MARKET_BTC_USD,
