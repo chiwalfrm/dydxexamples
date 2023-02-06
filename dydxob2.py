@@ -200,7 +200,7 @@ while True:
                 print(str(biditemprice).ljust(widthprice), str('('+str(biditemsize)+')').ljust(widthsize+2)+biditemoffset+biditemdate+biditemtime+' | '+str(askitemprice).ljust(widthprice), str('('+str(askitemsize)+')').ljust(widthsize+2)+askitemoffset+askitemdate+askitemtime, end = '\r')
                 if sys.argv[-1] != 'noansi' and fcreatedat != 0:
                         if biditemprice == float(fprice):
-                                print(REDWHITE+str(biditemprice)+NC, end = '\r')
+                                print(f"REDWHITE{biditemprice}NC", end = '\r')
                         elif askitemprice == float(fprice):
                                 print(str(biditemprice).ljust(widthprice), str('('+str(biditemsize)+')').ljust(widthsize+2)+biditemoffset+biditemdate+biditemtime+' | '+GREENWHITE+str(askitemprice)+NC, end = '\r')
                 print()
@@ -210,7 +210,7 @@ while True:
         print('bidvolume:', bidsizetotal)
         print('askvolume:', asksizetotal)
         print('minoffset:', lowestoffset)
-        print('maxoffset:', highestoffset, '(+'+str(highestoffset - lowestoffset)+')')
+        print(f"maxoffset: {highestoffset} (+{highestoffset - lowestoffset})")
         checkmarketdata('indexPrice')
         checkmarketdata('oraclePrice')
         checkmarketdata('priceChange24H')
