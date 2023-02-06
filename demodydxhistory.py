@@ -3,38 +3,27 @@ from ciso8601 import parse_datetime
 from dydx3 import Client
 from dydx3 import constants
 from os import path
+from requests import get
 from sys import argv
 
 ########################## YOU FILL THIS OUT #################
-_private_key = '<FILL_THIS_OUT>'
-#_private_key is optional and may be set to '' (hardware wallets do not generally provide this information)
-#If _private_key is set, you do not need to set _api_key/_api_secret/_api_passphrase/_stark_private_key
-_api_key = '<FILL_THIS_OUT>'
-_api_secret = '<FILL_THIS_OUT>'
-_api_passphrase = '<FILL_THIS_OUT>'
-_stark_private_key = '<FILL_THIS_OUT>'
-_eth_address = '<FILL_THIS_OUT>'
-_network_id = str(constants.NETWORK_ID_GOERLI)
-#_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
-_api_host = constants.API_HOST_GOERLI
-#_api_host is set to either constants.API_HOST_MAINNET or constants.API_HOST_GOERLI
+my_eth_private_key = '<FILL_THIS_OUT>'
+#my_eth_private_key is optional and may be set to '' (hardware wallets do not generally provide this information)
+#If my_eth_private_key is set, you do not need to set my_api_key/my_api_secret/my_api_passphrase/my_stark_private_key
+my_api_key = '<FILL_THIS_OUT>'
+my_api_secret = '<FILL_THIS_OUT>'
+my_api_passphrase = '<FILL_THIS_OUT>'
+my_stark_private_key = '<FILL_THIS_OUT>'
+my_eth_address = '<FILL_THIS_OUT>'
+my_api_network_id = str(constants.NETWORK_ID_GOERLI)
+#my_api_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
 ##############################################################
 
 if len(argv) > 3:
         if not path.exists(argv[3]):
                 print('ERROR: File', argv[3], 'does not exist.')
                 exit()
-        else:
-                exec(open(argv[3]).read())
-                _private_key = my_eth_private_key
-                _api_key = my_api_key
-                _api_secret = my_api_secret
-                _api_passphrase = my_api_passphrase
-                _stark_private_key = my_stark_private_key
-                _eth_address = my_eth_address
-                _network_id = my_api_network_id
-else:
-        my_api_network_id = _network_id
+        exec(open(argv[3]).read())
 if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
         my_api_host = constants.API_HOST_MAINNET
 elif my_api_network_id == str(constants.NETWORK_ID_GOERLI):
@@ -42,23 +31,22 @@ elif my_api_network_id == str(constants.NETWORK_ID_GOERLI):
 else:
         print(f"Error: my_api_network_id is not {constants.NETWORK_ID_MAINNET} or {constants.NETWORK_ID_GOERLI}.")
         exit()
-_api_host = my_api_host
 
-if _private_key != '':
+if my_eth_private_key != '':
         client = Client(
-                host = _api_host,
-                default_ethereum_address = _eth_address,
-                eth_private_key = _private_key,
-                network_id = _network_id
+                host = my_api_host,
+                default_ethereum_address = my_eth_address,
+                eth_private_key = my_eth_private_key,
+                network_id = my_api_network_id
         )
 else:
         client = Client(
-                host = _api_host,
-                network_id = _network_id,
+                host = my_api_host,
+                network_id = my_api_network_id,
                 api_key_credentials = {
-                        'key': _api_key,
-                        'secret': _api_secret,
-                        'passphrase': _api_passphrase
+                        'key': my_api_key,
+                        'secret': my_api_secret,
+                        'passphrase': my_api_passphrase
                 }
         )
 
