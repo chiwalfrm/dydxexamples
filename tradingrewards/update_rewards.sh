@@ -107,7 +107,13 @@ create_epoch_html ()
                                 echo $s1 `grep "^Epoch$count " $s1`
                         done | grep " Epoch[0-9]" | awk '{print $1" "$3}' | grep -v ' 0.000000$' | tr -d , | sort -k 2 -n -r > epoch$count.txt
                         cat << EOF > epoch$count.html
-<!DOCTYPE html PUBLIC"ISO/IEC 15445:2000//DTD HTML//EN"><html><head><title>title</title></head><body>
+<!DOCTYPE html PUBLIC"ISO/IEC 15445:2000//DTD HTML//EN"><html><head><title>title</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="HandheldFriendly" content="true">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+</head><body>
 <p style="font-family:'Courier New'">
 `wc -l epoch$count.txt | awk '{print $1}'` addresses loaded<br>
 Updated at `date`<br>
@@ -186,7 +192,13 @@ sort -n -r +1 epoch$lastepoch.txt | awk '{print $1}' | tr "[A-Z]" "[a-z]" > epoc
 echo "STAGE  6 Generating/updating trading reports..."
 totaladdresses=`wc -l epochaccounts_sorted_rewards.txt | awk '{print $1}'`
 cat <<EOF > $TMPFOLDER/update_rewards$$/output/whalelist.html
-<!DOCTYPE html PUBLIC"ISO/IEC 15445:2000//DTD HTML//EN"><html><head><title>title</title></head><body>
+<!DOCTYPE html PUBLIC"ISO/IEC 15445:2000//DTD HTML//EN"><html><head><title>title</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="HandheldFriendly" content="true">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+</head><body>
 <p style="font-family:'Courier New'">
 $totaladdresses addresses loaded<br>
 Updated at `date` (Epoch $lastepoch)<br>
