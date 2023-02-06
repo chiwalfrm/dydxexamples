@@ -1,25 +1,24 @@
+import base64
 import datetime
-from base64 import b64decode
 from ciso8601 import parse_datetime
 from cryptography.fernet import Fernet
 from dydx3 import Client
 from dydx3 import constants
 from os import path
+from requests import get
 from sys import argv
 
 ########################## YOU FILL THIS OUT #################
-_private_key_encrypted = '<FILL_THIS_OUT>'
-#_private_key_encrypted is optional and may be set to '' (hardware wallets do not generally provide this information)
-#If _private_key_encrypted is set, you do not need to set _api_key_encrypted/_api_secret_encrypted/_api_passphrase_encrypted/_stark_private_key_encrypted
-_api_key_encrypted = '<FILL_THIS_OUT>'
-_api_secret_encrypted = '<FILL_THIS_OUT>'
-_api_passphrase_encrypted = '<FILL_THIS_OUT>'
-_stark_private_key_encrypted = '<FILL_THIS_OUT>'
-_eth_address_encrypted = '<FILL_THIS_OUT>'
-_network_id = str(constants.NETWORK_ID_GOERLI)
-#_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
-_api_host = constants.API_HOST_GOERLI
-#_api_host is set to either constants.API_HOST_MAINNET or constants.API_HOST_GOERLI
+my_eth_private_key_encrypted = '<FILL_THIS_OUT>'
+#my_eth_private_key_encrypted is optional and may be set to '' (hardware wallets do not generally provide this information)
+#If my_eth_private_key_encrypted is set, you do not need to set my_api_key_encrypted/my_api_secret_encrypted/my_api_passphrase_encrypted/my_stark_private_key_encrypted
+my_api_key_encrypted = '<FILL_THIS_OUT>'
+my_api_secret_encrypted = '<FILL_THIS_OUT>'
+my_api_passphrase_encrypted = '<FILL_THIS_OUT>'
+my_stark_private_key_encrypted = '<FILL_THIS_OUT>'
+my_eth_address_encrypted = '<FILL_THIS_OUT>'
+my_api_network_id = str(constants.NETWORK_ID_GOERLI)
+#my_api_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
 ##############################################################
 
 def encrypt(message: bytes, key: bytes) -> bytes:
@@ -32,17 +31,7 @@ if len(argv) > 3:
         if not path.exists(argv[3]):
                 print('ERROR: File', argv[3], 'does not exist.')
                 exit()
-        else:
-                exec(open(argv[3]).read())
-                _private_key_encrypted = my_eth_private_key_encrypted
-                _api_key_encrypted = my_api_key_encrypted
-                _api_secret_encrypted = my_api_secret_encrypted
-                _api_passphrase_encrypted = my_api_passphrase_encrypted
-                _stark_private_key_encrypted = my_stark_private_key_encrypted
-                _eth_address_encrypted = my_eth_address_encrypted
-                _network_id = my_api_network_id
-else:
-        my_api_network_id = _network_id
+        exec(open(argv[3]).read())
 if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
         my_api_host = constants.API_HOST_MAINNET
 elif my_api_network_id == str(constants.NETWORK_ID_GOERLI):
@@ -67,30 +56,29 @@ if decryptionkey == 'encrypt':
                         print()
                         exit()
                 encryptedmessage = encrypt(encryptstring.encode(), encryptkey)
-                print(b64encode(encryptedmessage))
-_eth_address = decrypt(b64decode(_eth_address_encrypted), decryptionkey).decode()
-_api_host = my_api_host
+                print(base64.b64encode(encryptedmessage))
+my_eth_address = decrypt(base64.b64decode(my_eth_address_encrypted), decryptionkey).decode()
 
-if _private_key_encrypted != '':
-        _private_key = decrypt(b64decode(_private_key_encrypted), decryptionkey).decode()
+if my_eth_private_key_encrypted != '':
+        my_eth_private_key = decrypt(base64.b64decode(my_eth_private_key_encrypted), decryptionkey).decode()
         client = Client(
-                host = _api_host,
-                default_ethereum_address = _eth_address,
-                eth_private_key = _private_key,
-                network_id = _network_id
+                host = my_api_host,
+                default_ethereum_address = my_eth_address,
+                eth_private_key = my_eth_private_key,
+                network_id = my_api_network_id
         )
 else:
-        _api_key = decrypt(b64decode(_api_key_encrypted), decryptionkey).decode()
-        _api_secret = decrypt(b64decode(_api_secret_encrypted), decryptionkey).decode()
-        _api_passphrase = decrypt(b64decode(_api_passphrase_encrypted), decryptionkey).decode()
-        _stark_private_key = decrypt(b64decode(_stark_private_key_encrypted), decryptionkey).decode()
+        my_api_key = decrypt(base64.b64decode(my_api_key_encrypted), decryptionkey).decode()
+        my_api_secret = decrypt(base64.b64decode(my_api_secret_encrypted), decryptionkey).decode()
+        my_api_passphrase = decrypt(base64.b64decode(my_api_passphrase_encrypted), decryptionkey).decode()
+        my_stark_private_key = decrypt(base64.b64decode(my_stark_private_key_encrypted), decryptionkey).decode()
         client = Client(
-                host = _api_host,
-                network_id = _network_id,
+                host = my_api_host,
+                network_id = my_api_network_id,
                 api_key_credentials = {
-                        'key': _api_key,
-                        'secret': _api_secret,
-                        'passphrase': _api_passphrase
+                        'key': my_api_key,
+                        'secret': my_api_secret,
+                        'passphrase': my_api_passphrase
                 }
         )
 
