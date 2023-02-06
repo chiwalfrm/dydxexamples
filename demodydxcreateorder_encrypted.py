@@ -1,10 +1,10 @@
+import base64
 import time
 from cryptography.fernet import Fernet
 from datetime import datetime
 from dydx3 import Client
 from dydx3 import constants
 from dydx3 import epoch_seconds_to_iso
-from base64 import b64decode
 from os import path
 from random import randint
 from requests import get
@@ -33,10 +33,8 @@ if path.exists(argv[1]):
         exec(open(argv[1]).read())
 if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
         my_api_host = constants.API_HOST_MAINNET
-        my_ws_host = constants.WS_HOST_MAINNET
 elif my_api_network_id == str(constants.NETWORK_ID_GOERLI):
         my_api_host = constants.API_HOST_GOERLI
-        my_ws_host = constants.WS_HOST_GOERLI
 else:
         print(f"Error: my_api_network_id is not {constants.NETWORK_ID_MAINNET} or {constants.NETWORK_ID_GOERLI}.")
         exit()
@@ -57,11 +55,11 @@ if decryptionkey == 'encrypt':
                         print()
                         exit()
                 encryptedmessage = encrypt(encryptstring.encode(), encryptkey)
-                print(b64encode(encryptedmessage))
-my_eth_address = decrypt(b64decode(my_eth_address_encrypted), decryptionkey).decode()
+                print(base64.b64encode(encryptedmessage))
+my_eth_address = decrypt(base64.b64decode(my_eth_address_encrypted), decryptionkey).decode()
 
 if my_eth_private_key_encrypted != '':
-        my_eth_private_key = decrypt(b64decode(my_eth_private_key_encrypted), decryptionkey).decode()
+        my_eth_private_key = decrypt(base64.b64decode(my_eth_private_key_encrypted), decryptionkey).decode()
         client = Client(
                 host = my_api_host,
                 default_ethereum_address = my_eth_address,
@@ -72,10 +70,10 @@ if my_eth_private_key_encrypted != '':
         stark_private_key = derive_stark_key_result['private_key']
         client.stark_private_key = stark_private_key
 else:
-        my_api_key = decrypt(b64decode(my_api_key_encrypted), decryptionkey).decode()
-        my_api_secret = decrypt(b64decode(my_api_secret_encrypted), decryptionkey).decode()
-        my_api_passphrase = decrypt(b64decode(my_api_passphrase_encrypted), decryptionkey).decode()
-        my_stark_private_key = decrypt(b64decode(my_stark_private_key_encrypted), decryptionkey).decode()
+        my_api_key = decrypt(base64.b64decode(my_api_key_encrypted), decryptionkey).decode()
+        my_api_secret = decrypt(base64.b64decode(my_api_secret_encrypted), decryptionkey).decode()
+        my_api_passphrase = decrypt(base64.b64decode(my_api_passphrase_encrypted), decryptionkey).decode()
+        my_stark_private_key = decrypt(base64.b64decode(my_stark_private_key_encrypted), decryptionkey).decode()
         client = Client(
                 host = my_api_host,
                 network_id = my_api_network_id,
