@@ -25,10 +25,8 @@ if len(argv) > 1 and path.exists(argv[1]):
         exec(open(argv[1]).read())
 if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
         my_api_host = constants.API_HOST_MAINNET
-        my_ws_host = constants.WS_HOST_MAINNET
 elif my_api_network_id == str(constants.NETWORK_ID_GOERLI):
         my_api_host = constants.API_HOST_GOERLI
-        my_ws_host = constants.WS_HOST_GOERLI
 else:
         print(f"Error: my_api_network_id is not {constants.NETWORK_ID_MAINNET} or {constants.NETWORK_ID_GOERLI}.")
         exit()
