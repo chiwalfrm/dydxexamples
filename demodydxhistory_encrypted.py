@@ -48,7 +48,7 @@ if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
 elif my_api_network_id == str(constants.NETWORK_ID_GOERLI):
         my_api_host = constants.API_HOST_GOERLI
 else:
-        print('Error: my_api_network_id is not '+str(constants.NETWORK_ID_MAINNET)+' or '+str(constants.NETWORK_ID_GOERLI)+'.')
+        print(f"Error: my_api_network_id is not {constants.NETWORK_ID_MAINNET} or {constants.NETWORK_ID_GOERLI}.")
         exit()
 
 print("Enter decryption key (type 'encrypt' to encrypt): ", end = '')
