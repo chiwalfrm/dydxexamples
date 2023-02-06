@@ -65,8 +65,8 @@ print('my_api_secret=\'' + recover_default_api_key_credentials_results['secret']
 print('my_api_passphrase=\'' + recover_default_api_key_credentials_results['passphrase'] + '\'')
 print('my_stark_private_key=\'' + stark_private_key + '\'')
 print('my_eth_address=\'' + my_eth_address + '\'')
-print('_stark_public_key=\'' + public_x + '\'')
-print('_stark_public_key_y_coordinate=\'' + public_y + '\'')
+print('my_stark_public_key=\'' + public_x + '\'')
+print('my_stark_public_key_y_coordinate=\'' + public_y + '\'')
 #Uncomment this block to request free testnet tokens
 #request_testnet_tokens_results = client.private.request_testnet_tokens()
 #print(request_testnet_tokens_results.data)
