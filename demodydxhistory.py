@@ -3,6 +3,7 @@ from ciso8601 import parse_datetime
 from dydx3 import Client
 from dydx3 import constants
 from os import path
+from random import randint
 from requests import get
 from sys import argv
 
