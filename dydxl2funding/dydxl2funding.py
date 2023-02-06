@@ -1,7 +1,7 @@
-from dydx3 import Client
-from dydx3 import constants
 import pprint
 import sys
+from dydx3 import Client
+from dydx3 import constants
 
 pp = pprint.PrettyPrinter(width = 41, compact = True)
 
