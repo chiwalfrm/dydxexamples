@@ -29,7 +29,7 @@ elif my_api_network_id == str(constants.NETWORK_ID_GOERLI):
         my_api_host = constants.API_HOST_GOERLI
         my_ws_host = constants.WS_HOST_GOERLI
 else:
-        print('Error: my_api_network_id is not '+str(constants.NETWORK_ID_MAINNET)+' or '+str(constants.NETWORK_ID_GOERLI)+'.')
+        print(f"Error: my_api_network_id is not {constants.NETWORK_ID_MAINNET} or {constants.NETWORK_ID_GOERLI}.")
         exit()
 
 if my_eth_private_key != '':
