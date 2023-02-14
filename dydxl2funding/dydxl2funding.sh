@@ -21,13 +21,13 @@ s8=0
 s9=0
 for s1 in $*
 do
-        market = `echo $s1 | cut -d : -f 1`
+        market=`echo $s1 | cut -d : -f 1`
         python3 dydxl2funding.py $market | grep "'rate': " | cut -d \' -f 4 > $XDG_RUNTIME_DIR/dydxl2funding$market.out 2>&1 &
 done
 wait
 for s1 in $*
 do
-        market = `echo $s1 | cut -d : -f 1`
+        market=`echo $s1 | cut -d : -f 1`
         highlight=`echo $s1 | cut -d : -f 2`
         if [ "$highlight" = 1 ]
         then
