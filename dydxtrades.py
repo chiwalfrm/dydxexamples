@@ -62,12 +62,12 @@ handler = logging.handlers.RotatingFileHandler(ramdiskpath+'/dydxtrades'+market+
 )
 logger.addHandler(handler)
 
-if os.path.exists(ramdiskpath) == False:
+if os.path.isdir(ramdiskpath) == False:
         print('Error: Ramdisk', ramdiskpath, 'not mounted')
         sys.exit()
 if os.path.ismount(ramdiskpath) == False:
         print('Warning:', ramdiskpath, 'is not a mount point')
-if os.path.exists(ramdiskpath+'/'+market) == False:
+if os.path.isdir(ramdiskpath+'/'+market) == False:
         os.system('mkdir -p '+ramdiskpath+'/'+market)
 
 maxwidthtradeprice = 0
