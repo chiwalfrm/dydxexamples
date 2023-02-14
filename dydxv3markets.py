@@ -89,7 +89,7 @@ handler = logging.handlers.RotatingFileHandler(ramdiskpath+'/dydxv3markets.log',
 )
 logger.addHandler(handler)
 
-if os.path.exists(ramdiskpath) == False:
+if os.path.isdir(ramdiskpath) == False:
         print('Error: Ramdisk', ramdiskpath, 'not mounted')
         sys.exit()
 if os.path.ismount(ramdiskpath) == False:
@@ -113,7 +113,7 @@ while True:
                 for item in api_data['contents'].items():
                         market = item[0]
                         marketdata = item[1]
-                        if os.path.exists(ramdiskpath+'/'+market) == False:
+                        if os.path.isdir(ramdiskpath+'/'+market) == False:
                                 os.system('mkdir -p '+ramdiskpath+'/'+market)
                         for marketdata in marketdata.items():
                                 marketdataelement = marketdata[0]
