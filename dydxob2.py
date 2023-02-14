@@ -30,7 +30,7 @@ def handler(signum, frame):
         sys.exit()
 
 def checkmarketdata(file):
-        if os.path.exists(ramdiskpath+'/'+market+'/'+file) == True:
+        if os.path.isfile(ramdiskpath+'/'+market+'/'+file) == True:
                 fname = []
                 while len(fname) != 3:
                         fp = open(ramdiskpath+'/'+market+'/'+file)
@@ -57,16 +57,16 @@ if len(sys.argv) < 3:
         depth = 10
 else:
         depth = int(sys.argv[2])
-if os.path.exists(ramdiskpath+'/'+market+'/asks') == False:
+if os.path.isdir(ramdiskpath+'/'+market+'/asks') == False:
         print('Error: Asks directory', ramdiskpath+'/'+market+'/asks', 'not found')
         sys.exit()
-if os.path.exists(ramdiskpath+'/'+market+'/bids') == False:
+if os.path.isdir(ramdiskpath+'/'+market+'/bids') == False:
         print('Error: Bids directory', ramdiskpath+'/'+market+'/bids', 'not found')
         sys.exit()
-if os.path.exists(ramdiskpath+'/'+market+'/lasttrade') == False:
+if os.path.isfile(ramdiskpath+'/'+market+'/lasttrade') == False:
         print('Warning: lasttrade file', ramdiskpath+'/'+market+'/lasttrade', 'not found')
 while True:
-        if os.path.exists(ramdiskpath+'/'+market+'/lasttrade') == True:
+        if os.path.isfile(ramdiskpath+'/'+market+'/lasttrade') == True:
                 fname = []
                 while len(fname) != 4:
                         fp = open(ramdiskpath+'/'+market+'/lasttrade')
@@ -200,7 +200,7 @@ while True:
                 print(str(biditemprice).ljust(widthprice), str('('+str(biditemsize)+')').ljust(widthsize+2)+biditemoffset+biditemdate+biditemtime+' | '+str(askitemprice).ljust(widthprice), str('('+str(askitemsize)+')').ljust(widthsize+2)+askitemoffset+askitemdate+askitemtime, end = '\r')
                 if sys.argv[-1] != 'noansi' and fcreatedat != 0:
                         if biditemprice == float(fprice):
-                                print(f"REDWHITE{biditemprice}NC", end = '\r')
+                                print(f"{REDWHITE}{biditemprice}{NC}", end = '\r')
                         elif askitemprice == float(fprice):
                                 print(str(biditemprice).ljust(widthprice), str('('+str(biditemsize)+')').ljust(widthsize+2)+biditemoffset+biditemdate+biditemtime+' | '+GREENWHITE+str(askitemprice)+NC, end = '\r')
                 print()
@@ -219,7 +219,9 @@ while True:
         checkmarketdata('openInterest')
         checkmarketdata('trades24H')
         checkmarketdata('volume24H')
-        if os.path.exists(ramdiskpath+'/'+market+'/EXITFLAG') == True:
+        if os.path.isfile(os.path.dirname(__file__)+'/'+market+'/EXITFLAG'):
+                sys.exit()
+        elif os.path.isfile(ramdiskpath+'/'+market+'/EXITFLAG') == True:
                 os.system('rm '+ramdiskpath+'/'+market+'/EXITFLAG')
                 sys.exit()
         else:
