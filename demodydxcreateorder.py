@@ -21,7 +21,7 @@ my_api_network_id = str(constants.NETWORK_ID_GOERLI)
 #my_api_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
 ##############################################################
 
-if len(argv) > 1 and path.exists(argv[1]):
+if len(argv) > 1 and path.isfile(argv[1]):
         exec(open(argv[1]).read())
 if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
         my_api_host = constants.API_HOST_MAINNET
