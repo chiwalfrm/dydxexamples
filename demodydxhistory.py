@@ -21,7 +21,7 @@ my_api_network_id = str(constants.NETWORK_ID_GOERLI)
 ##############################################################
 
 if len(argv) > 3:
-        if not path.exists(argv[3]):
+        if not path.isfile(argv[3]):
                 print('ERROR: File', argv[3], 'does not exist.')
                 exit()
         exec(open(argv[3]).read())
