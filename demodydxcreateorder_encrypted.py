@@ -29,7 +29,7 @@ def encrypt(message: bytes, key: bytes) -> bytes:
 def decrypt(token: bytes, key: bytes) -> bytes:
         return Fernet(key).decrypt(token)
 
-if path.exists(argv[1]):
+if path.isfile(argv[1]):
         exec(open(argv[1]).read())
 if my_api_network_id == str(constants.NETWORK_ID_MAINNET):
         my_api_host = constants.API_HOST_MAINNET
