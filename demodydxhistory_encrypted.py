@@ -29,7 +29,7 @@ def decrypt(token: bytes, key: bytes) -> bytes:
         return Fernet(key).decrypt(token)
 
 if len(argv) > 3:
-        if not path.exists(argv[3]):
+        if not path.isfile(argv[3]):
                 print('ERROR: File', argv[3], 'does not exist.')
                 exit()
         exec(open(argv[3]).read())
