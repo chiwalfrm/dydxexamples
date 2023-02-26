@@ -106,11 +106,18 @@ while True:
                                 ftime = fname[4]
                                 bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
         if len(bidarray) == 0 or len(askarray) == 0:
+                print('Warning: asks or bids empty', str(len(bidarray)), str(len(askarray)), datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 fp = open(ramdiskpath+'/'+market+'/TRAPemptyarrays', "a")
                 fp.write(str(len(bidarray))+','+str(len(askarray))+',0,'+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                 fp.close()
-                time.sleep(1)
-                continue
+                if os.path.isfile(os.path.dirname(__file__)+'/'+market+'/EXITFLAG'):
+                        sys.exit()
+                elif os.path.isfile(ramdiskpath+'/'+market+'/EXITFLAG') == True:
+                        os.system('rm '+ramdiskpath+'/'+market+'/EXITFLAG')
+                        sys.exit()
+                else:
+                        time.sleep(1)
+                        continue
         highestbidprice = 0
         lowestaskprice = 0
         while len(bidarray) > 0 and len(askarray) > 0 and ( highestbidprice == 0 or highestbidprice >= lowestaskprice ):
@@ -136,11 +143,18 @@ while True:
                                 else:
                                         askarray.pop(0)
         if len(bidarray) == 0 or len(askarray) == 0:
+                print('Warning: asks or bids empty', str(len(bidarray)), str(len(askarray)), datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 fp = open(ramdiskpath+'/'+market+'/TRAPemptyarrays', "a")
                 fp.write(str(len(bidarray))+','+str(len(askarray))+',1,'+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                 fp.close()
-                time.sleep(1)
-                continue
+                if os.path.isfile(os.path.dirname(__file__)+'/'+market+'/EXITFLAG'):
+                        sys.exit()
+                elif os.path.isfile(ramdiskpath+'/'+market+'/EXITFLAG') == True:
+                        os.system('rm '+ramdiskpath+'/'+market+'/EXITFLAG')
+                        sys.exit()
+                else:
+                        time.sleep(1)
+                        continue
         count = 0
         highestoffset = 0
         lowestoffset = 0
