@@ -174,8 +174,8 @@ while True:
                 ws.close()
                 time.sleep(1)
                 try:
-                        os.system('rmdir -r '+ramdiskpath+'/'+market+'/asks')
-                        os.system('rmdir -r '+ramdiskpath+'/'+market+'/bids')
+                        os.system('rm -rf '+ramdiskpath+'/'+market+'/asks')
+                        os.system('rm -rf '+ramdiskpath+'/'+market+'/bids')
                         os.system('mkdir -p '+ramdiskpath+'/'+market+'/asks')
                         os.system('mkdir -p '+ramdiskpath+'/'+market+'/bids')
                         openconnection()
