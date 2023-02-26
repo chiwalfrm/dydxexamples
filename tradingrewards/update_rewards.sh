@@ -246,6 +246,7 @@ cd $TMPFOLDER/update_rewards$$/output && find . -newer $TMPFOLDER/update_rewards
 cd "$WORKINGDIR"
 echo "STAGE 11 Creating Epoch Leaderboards..."
 create_epoch_html
+cp -p whalelist.html index.html
 echo "STAGE 12 Cleaning up..."
 cleanup
 echo "STAGE 13 Complete"
