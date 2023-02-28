@@ -69,4 +69,4 @@ do
         fi
 done
 endtimestamp=`date +%s`
-echo "Report Generation Time: $((endtimestamp - starttimestamp)) seconds"
+echo "Generated: `date` / Runtime $((endtimestamp - starttimestamp)) seconds"
