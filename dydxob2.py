@@ -165,31 +165,57 @@ while True:
                 if sys.argv[3] == 'compact':
                         if fcreatedat != 0:
                                 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), fcreatedat, fprice, fside, fsize)
-                        print('Bid'+' '.ljust(widthprice+widthsize+15)+'| Ask')
+                        print('Bid'+' '.ljust(widthprice+widthsize+26)+'| Ask')
                 elif sys.argv[3] == 'ultracompact':
                         if fcreatedat != 0:
                                 print(fcreatedat[5:], fprice, fside, fsize)
-                        print('Bid'+' '.ljust(widthprice+widthsize+1)+'| Ask')
+                        print('Bid'+' '.ljust(widthprice+widthsize+12)+'| Ask')
         else:
                 if fcreatedat != 0:
                         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Last trade:', fcreatedat, fprice, fside, fsize)
-                print('Bid'+' '.ljust(widthprice+widthsize+widthoffset+22)+'| Ask')
-        while count < min(depth, len(bidarray), len(askarray)):
-                biditem = bidarray[count]
-                biditemprice = float(biditem[0])
-                biditemsize = float(biditem[1])
-                biditemoffset = int(biditem[2])
-                biditemdate = ' '+biditem[3]
-                biditemtime = ' '+biditem[4]
-                askitem = askarray[count]
-                askitemprice = float(askitem[0])
-                askitemsize = float(askitem[1])
-                askitemoffset = int(askitem[2])
-                askitemdate = ' '+askitem[3]
-                askitemtime = ' '+askitem[4]
+                print('Bid'+' '.ljust(widthprice+widthsize+widthoffset+21)+'| Ask')
+        while count < min(depth, max(len(bidarray), len(askarray))):
+                if count < len(bidarray):
+                        biditem = bidarray[count]
+                        biditemprice = float(biditem[0])
+                        biditemsize = float(biditem[1])
+                        biditemoffset = int(biditem[2])
+                        biditemdate = ' '+biditem[3]
+                        biditemtime = ' '+biditem[4]
+                else:
+                        biditemprice = ''
+                        biditemsize = ''
+                        biditemoffset = 0
+                        biditemdate = ''
+                        biditemtime = ''
+                if count < len(askarray):
+                        askitem = askarray[count]
+                        askitemprice = float(askitem[0])
+                        askitemsize = float(askitem[1])
+                        askitemoffset = int(askitem[2])
+                        askitemdate = ' '+askitem[3]
+                        askitemtime = ' '+askitem[4]
+                else:
+                        askitemprice = ''
+                        askitemsize = ''
+                        askitemoffset = 0
+                        askitemdate = ''
+                        askitemtime = ''
                 highestoffset = max(biditemoffset, askitemoffset, highestoffset)
-                bidsizetotal += biditemsize
-                asksizetotal += askitemsize
+                if biditemsize != '':
+                        bidsizetotal += biditemsize
+                        biditemsizet = '('+str(biditemsize)+')'
+                        biditemoffsett = str(biditemoffset)
+                else:
+                        biditemsizet = ''
+                        biditemoffsett = ''
+                if askitemsize != '':
+                        asksizetotal += askitemsize
+                        askitemsizet = '('+str(askitemsize)+')'
+                        askitemoffsett = str(askitemoffset)
+                else:
+                        askitemsizet = ''
+                        askitemoffsett = ''
                 if count == 0:
                         highestbidprice = biditemprice
                         lowestaskprice = askitemprice
@@ -212,12 +238,12 @@ while True:
                 else:
                         biditemoffset = ' '+str(biditemoffset).ljust(widthoffset)
                         askitemoffset = ' '+str(askitemoffset).ljust(widthoffset)
-                print(str(biditemprice).ljust(widthprice), str('('+str(biditemsize)+')').ljust(widthsize+2)+biditemoffset+biditemdate+biditemtime+' | '+str(askitemprice).ljust(widthprice), str('('+str(askitemsize)+')').ljust(widthsize+2)+askitemoffset+askitemdate+askitemtime, end = '\r')
+                print(str(biditemprice).ljust(widthprice), biditemsizet.ljust(widthsize+2)+biditemoffsett.rjust(widthoffset)+biditemdate+biditemtime+' | '+str(askitemprice).ljust(widthprice), askitemsizet.ljust(widthsize+2)+askitemoffsett.rjust(widthoffset)+askitemdate+askitemtime, end = '\r')
                 if sys.argv[-1] != 'noansi' and fcreatedat != 0:
                         if biditemprice == float(fprice):
                                 print(f"{REDWHITE}{biditemprice}{NC}", end = '\r')
                         elif askitemprice == float(fprice):
-                                print(str(biditemprice).ljust(widthprice), str('('+str(biditemsize)+')').ljust(widthsize+2)+biditemoffset+biditemdate+biditemtime+' | '+GREENWHITE+str(askitemprice)+NC, end = '\r')
+                                print(str(biditemprice).ljust(widthprice), biditemsizet.ljust(widthsize+2)+biditemoffsett.rjust(widthoffset)+biditemdate+biditemtime+' | '+GREENWHITE+str(askitemprice)+NC, end = '\r')
                 print()
                 count += 1
         print('maxbid   :', highestbidprice)
