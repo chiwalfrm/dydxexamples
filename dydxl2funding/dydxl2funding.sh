@@ -3,7 +3,7 @@
 #per 1hr: 1.0 / 24 = 0.0416666666666667 --> 416
 starttimestamp=`date +%s`
 i1=416
-if [ -t 1 ]
+if [ -t 1 -o "$scriptcolors" = "1" ]
 then
         RED='\033[0;31m'
         GREEN='\033[0;32m'
@@ -30,11 +30,13 @@ for s1 in $*
 do
         market=`echo $s1 | cut -d : -f 1`
         highlight=`echo $s1 | cut -d : -f 2`
-        if [ "$highlight" = 1 ]
+        if [ \( -t 1 -o "$scriptcolors" = "1" \) -a "$highlight" = 1 ]
         then
                 backgroundcolor='\e[1;46m'
+                backgroundcoloroff='\e[0m'
         else
                 backgroundcolor=
+                backgroundcoloroff=
         fi
         s4=`head -1 $XDG_RUNTIME_DIR/dydxl2funding$market.out`
         for s5 in `head -8 $XDG_RUNTIME_DIR/dydxl2funding$market.out`
@@ -45,7 +47,7 @@ do
         do
                 s8=`LC_NUMERIC=en_US.utf8 /usr/bin/printf "$s8 + %f\n" $s2 | bc`
         done
-        /usr/bin/printf "${backgroundcolor}%-12s \e[0m" $market
+        /usr/bin/printf "${backgroundcolor}%-12s ${backgroundcoloroff}" $market
         s10=`printf "%.0f\n" "\`LC_NUMERIC=en_US.utf8 /usr/bin/printf \"%f * 1000000\n\" $s4 | bc | sed 's/^-//'\`"`
         if [ "$s10" -gt "$i1" ]
         then
