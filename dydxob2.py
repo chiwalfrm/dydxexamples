@@ -66,6 +66,7 @@ if os.path.isdir(ramdiskpath+'/'+market+'/bids') == False:
 if os.path.isfile(ramdiskpath+'/'+market+'/lasttrade') == False:
         print('Warning: lasttrade file', ramdiskpath+'/'+market+'/lasttrade', 'not found')
 while True:
+        starttime = datetime.now()
         if os.path.isfile(ramdiskpath+'/'+market+'/lasttrade') == True:
                 fname = []
                 while len(fname) != 4:
@@ -233,6 +234,8 @@ while True:
         checkmarketdata('openInterest')
         checkmarketdata('trades24H')
         checkmarketdata('volume24H')
+        endtime = datetime.now()
+        print('Runtime        :' , endtime - starttime)
         if os.path.isfile(os.path.dirname(__file__)+'/'+market+'/EXITFLAG'):
                 sys.exit()
         elif os.path.isfile(ramdiskpath+'/'+market+'/EXITFLAG') == True:
