@@ -1,6 +1,7 @@
 #!/bin/sh
 #per 1hr: 0.5 / 24 = 0.0208333333333333 --> 208
 #per 1hr: 1.0 / 24 = 0.0416666666666667 --> 416
+starttimestamp=`date +%s`
 i1=416
 if [ -t 1 ]
 then
@@ -67,3 +68,5 @@ do
                 LC_NUMERIC=en_US.utf8 /usr/bin/printf "${GREEN}%'9.6f (24hr)${NC} dydxl2\n" $s8
         fi
 done
+endtimestamp=`date +%s`
+echo "Report Generation Time: $((endtimestamp - starttimestamp)) seconds"
