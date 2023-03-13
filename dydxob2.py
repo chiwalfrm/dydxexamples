@@ -82,6 +82,13 @@ while True:
                 fcreatedat = 0
         askarray = []
         bidarray = []
+        count = 0
+        while os.path.isdir(ramdiskpath+'/'+market+'/asks') == False:
+                time.sleep(1)
+                count += 1
+                if count > 60:
+                        print("Error: Timeout waiting for", ramdiskpath+'/'+market+'/asks')
+                        sys.exit()
         askprices = os.popen('cd '+ramdiskpath+'/'+market+'/asks; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n').read()
         askpriceslist = askprices.split("\n")
         for askprice in askpriceslist:
@@ -94,6 +101,13 @@ while True:
                                 fdate = fname[3]
                                 ftime = fname[4]
                                 askarray.append([line, fasksize, faskoffset, fdate, ftime])
+        count = 0
+        while os.path.isdir(ramdiskpath+'/'+market+'/bids') == False:
+                time.sleep(1)
+                count += 1
+                if count > 60:
+                        print("Error: Timeout waiting for", ramdiskpath+'/'+market+'/bids')
+                        sys.exit()
         bidprices = os.popen('cd '+ramdiskpath+'/'+market+'/bids; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n -r').read()
         bidpriceslist = bidprices.split("\n")
         for bidprice in bidpriceslist:
