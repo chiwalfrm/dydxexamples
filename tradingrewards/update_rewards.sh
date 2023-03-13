@@ -6,7 +6,7 @@ cleanup ()
 {
         if [ "$1" = "trap" ]
         then
-                trap - EXIT INT HUP
+                trap - EXIT HUP INT
                 echo
                 echo "Ctrl-C detected. Cleaning up. Please wait 60 seconds..."
                 if [ "`uname`" = "Darwin" ]
@@ -31,7 +31,7 @@ cleanup ()
 }
 
 pid=$$
-trap 'cleanup trap' INT HUP
+trap 'cleanup trap' HUP INT
 
 prepare_epoch_file ()
 {
