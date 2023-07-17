@@ -1,0 +1,8 @@
+my_api_network_id = '<FILL THIS OUT>'
+my_api_key = '<FILL THIS OUT>'
+my_api_secret = '<FILL THIS OUT>'
+my_api_passphrase = '<FILL THIS OUT>'
+my_stark_private_key = '<FILL THIS OUT>'
+my_eth_address = '<FILL THIS OUT>'
+my_eth_private_key = '<[OPTIONAL] FILL THIS OUT>''
+simpleorderbook = 'y'
