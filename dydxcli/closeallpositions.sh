@@ -12,7 +12,7 @@ then
         echo "Error: apikeyfile $apikeyfile not found"
         exit
 fi
-python3 $WORKINGDIR/alphatradingbotdydx.py $apikeyfile positions > /tmp/closeallpositions.log$$
+python3 $WORKINGDIR/dydxcli.py $apikeyfile positions > /tmp/closeallpositions.log$$
 if [ ! -s /tmp/closeallpositions.log$$ ]
 then
         echo "*** NO OPEN POSITIONS ***"
@@ -26,8 +26,8 @@ do
         if [ "`echo $quantity | cut -c 1`" = '-' ]
         then
                 # close short position
-                echo "python3 $WORKINGDIR/alphatradingbotdydx.py $apikeyfile buyquantity $dydxmarket ${quantity#-}"
-                python3 $WORKINGDIR/alphatradingbotdydx.py $apikeyfile buyquantity $dydxmarket ${quantity#-} > /tmp/closeallpositions2.log$$
+                echo "python3 $WORKINGDIR/dydx.py $apikeyfile buyquantity $dydxmarket ${quantity#-}"
+                python3 $WORKINGDIR/dydx.py $apikeyfile buyquantity $dydxmarket ${quantity#-} > /tmp/closeallpositions2.log$$
                 if [ "`tail -1 /tmp/closeallpositions2.log$$`" != FILLED ]
                 then
                         echo "Error: Problem with order"
@@ -36,8 +36,8 @@ do
                 fi
         else
                 # close long position
-                echo "python3 $WORKINGDIR/alphatradingbotdydx.py $apikeyfile buyquantity $dydxmarket $quantity"
-                python3 $WORKINGDIR/alphatradingbotdydx.py $apikeyfile sellquantity $dydxmarket $quantity > /tmp/closeallpositions2.log$$
+                echo "python3 $WORKINGDIR/dydx.py $apikeyfile buyquantity $dydxmarket $quantity"
+                python3 $WORKINGDIR/dydx.py $apikeyfile sellquantity $dydxmarket $quantity > /tmp/closeallpositions2.log$$
                 if [ "`tail -1 /tmp/closeallpositions2.log$$`" != FILLED ]
                 then
                         echo "Error: Problem with order"
@@ -46,7 +46,7 @@ do
                 fi
         fi
 done
-python3 $WORKINGDIR/alphatradingbotdydx.py $apikeyfile positions > /tmp/closeallpositions.log$$
+python3 $WORKINGDIR/dydx.py $apikeyfile positions > /tmp/closeallpositions.log$$
 if [ ! -s /tmp/closeallpositions.log$$ ]
 then
         echo "*** ALL POSITIONS CLOSED ***"
