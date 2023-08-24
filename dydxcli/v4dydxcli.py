@@ -1,5 +1,3 @@
-import os
-import time
 from datetime import datetime
 from dydx4 import chain
 from dydx4 import clients
