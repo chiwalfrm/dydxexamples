@@ -1,3 +1,5 @@
+import os
+import time
 from datetime import datetime
 from dydx4 import chain
 from dydx4 import clients
@@ -24,9 +26,9 @@ def sendorder():
                 client_id = clientid,
                 time_in_force = ordertif,
                 good_til_time_in_seconds = orderexpiration,
-                execution=clients.helpers.chain_helpers.OrderExecution.DEFAULT,
-                post_only=False,
-                reduce_only=False
+                execution = clients.helpers.chain_helpers.OrderExecution.DEFAULT,
+                post_only = False,
+                reduce_only = False
         )
 
 #dydxmarket
@@ -66,6 +68,16 @@ def getstepsize():
                 dydxstepsize = r.json()['markets'][dydxmarket]['stepSize']
         else:
                 print('Bad requests status code:', r.status_code)
+
+#clientid
+def findorder():
+        get_subaccount_orders_result = client.indexer_client.account.get_subaccount_orders(subaccount.address, 0)
+        for item in get_subaccount_orders_result.data:
+                if item['clientId'] == clientid:
+                        return item
+        print('Order not found', clientid)
+        return None
+
 if len(argv) > 1 and path.isfile(argv[1]):
         exec(open(argv[1]).read())
 
@@ -109,6 +121,7 @@ elif command == 'buyquantity':
         print('response        :', place_order_result.response)
         print('contract_code_id:', place_order_result.contract_code_id)
         print('contract_address:', place_order_result.contract_address)
+        print(clientid)
 elif command == 'sellquantity':
         if len(argv) < 4:
                 print('Error: Must specify market, quantity')
@@ -132,6 +145,7 @@ elif command == 'sellquantity':
         print('response        :', place_order_result.response)
         print('contract_code_id:', place_order_result.contract_code_id)
         print('contract_address:', place_order_result.contract_address)
+        print(clientid)
 elif command == 'buyusdc':
         if len(argv) < 4:
                 print('Error: Must specify market, USDCquantity')
@@ -156,6 +170,7 @@ elif command == 'buyusdc':
         print('response        :', place_order_result.response)
         print('contract_code_id:', place_order_result.contract_code_id)
         print('contract_address:', place_order_result.contract_address)
+        print(clientid)
 elif command == 'sellusdc':
         if len(argv) < 4:
                 print('Error: Must specify market, USDCquantity')
@@ -182,3 +197,11 @@ elif command == 'sellusdc':
         print('response        :', place_order_result.response)
         print('contract_code_id:', place_order_result.contract_code_id)
         print('contract_address:', place_order_result.contract_address)
+        print(clientid)
+elif command == 'getorder':
+        if len(argv) < 3:
+                print('Error: Must specify clientid')
+                exit()
+        clientid = argv[3]
+        order = findorder()
+        print(order)
