@@ -9,6 +9,21 @@ from random import randint
 from requests import get
 from sys import argv
 
+########################## YOU FILL THIS OUT #################
+my_eth_private_key = '<FILL_THIS_OUT>'
+#my_eth_private_key is optional and may be set to '' (hardware wallets do not generally provide this information)
+#If my_eth_private_key is set, you do not need to set my_api_key/my_api_secret/my_api_passphrase/my_stark_private_key
+my_api_key = '<FILL_THIS_OUT>'
+my_api_secret = '<FILL_THIS_OUT>'
+my_api_passphrase = '<FILL_THIS_OUT>'
+my_stark_private_key = '<FILL_THIS_OUT>'
+my_eth_address = '<FILL_THIS_OUT>'
+my_api_network_id = str(constants.NETWORK_ID_GOERLI)
+#my_api_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
+whitelisted = False
+simpleorderbook = 'n'
+##############################################################
+
 #ordermarket/orderside/ordertype/ordersize/orderprice/orderexpiration/ordertif
 def sendorder():
         global create_order_result
@@ -32,6 +47,39 @@ def getprices():
         global bestask
         bestbid = os.popen("python3 -u "+orderbookprogram+" "+dydxmarket+" 1 noansi | sed -n '"+str(orderbookline)+","+str(orderbookline)+"p' | awk '{print $1}'").read()[:-1]
         bestask = os.popen("python3 -u "+orderbookprogram+" "+dydxmarket+" 1 noansi | sed -n '"+str(orderbookline)+","+str(orderbookline)+"p' | cut -d \| -f 2 | awk '{print $1}'").read()[:-1]
+
+#dydxmarket
+def getticksize():
+        global dydxticksize
+        r = get(url = my_api_host+'/v3/markets')
+        r.raise_for_status()
+        if r.status_code == 200:
+                for key, value in r.json()['markets'].items():
+                        if key == dydxmarket:
+                                dydxticksize = value['tickSize']
+        else:
+                print('Bad requests status code:', r.status_code)
+
+#dydxmarket
+def getstepsize():
+        global dydxstepsize
+        r = get(url = my_api_host+'/v3/markets')
+        r.raise_for_status()
+        if r.status_code == 200:
+                for key, value in r.json()['markets'].items():
+                        if key == dydxmarket:
+                                dydxstepsize = value['stepSize']
+        else:
+                print('Bad requests status code:', r.status_code)
+
+#orderid
+def findorder():
+        try:
+                get_order_by_id_result = client.private.get_order_by_id(orderid)
+                return get_order_by_id_result.data
+        except Exception as error:
+                print(error)
+                return None
 
 if len(argv) > 1 and path.isfile(argv[1]):
         exec(open(argv[1]).read())
@@ -93,14 +141,12 @@ else:
 if command == 'balance':
         get_accounts_result = client.private.get_accounts()
         print(get_accounts_result.data['accounts'][0]['equity'])
-        exit()
 elif command == 'positions':
         get_positions_result = client.private.get_positions(
                 status = constants.POSITION_STATUS_OPEN
         )
         for key in get_positions_result.data['positions']:
                 print(key['market'].ljust(9), key['size'])
-        exit()
 elif command == 'buyquantity':
         if len(argv) < 4:
                 print('Error: Must specify market, quantity')
@@ -114,12 +160,15 @@ elif command == 'buyquantity':
         orderprice = str(float(bestask) * 2)
         orderexpiration = epoch_seconds_to_iso(time.time() + 70)
         ordertif = 'FOK'
+        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif)
         sendorder()
         print(create_order_result.data)
         print(create_order_result.headers)
         orderid = create_order_result.data['order']['id']
         time.sleep(1)
         get_order_by_id_result = client.private.get_order_by_id(orderid)
+        print(get_order_by_id_result.data)
+        print(get_order_by_id_result.headers)
         orderstatus = get_order_by_id_result.data['order']['status']
         print(orderstatus)
 elif command == 'sellquantity':
@@ -132,14 +181,7 @@ elif command == 'sellquantity':
         ordertype = constants.ORDER_TYPE_MARKET
         dydxmarket = ordermarket
         if simpleorderbook == 'y':
-                r = get(url = my_api_host+'/v3/markets')
-                r.raise_for_status()
-                if r.status_code == 200:
-                        for key, value in r.json()['markets'].items():
-                                if key == dydxmarket:
-                                        dydxticksize = value['tickSize']
-                else:
-                        print('Bad requests status code:', r.status_code)
+                getticksize()
         else:
                 dydxticksize = os.popen("tail -1 /mnt/"+ramdiskpath+"/dydxmarketdata/"+dydxmarket+"/tickSize").read()[:-1]
         getprices()
@@ -147,12 +189,15 @@ elif command == 'sellquantity':
         orderprice = '%g'%(orderprice - (orderprice % float(dydxticksize)))
         orderexpiration = epoch_seconds_to_iso(time.time() + 70)
         ordertif = 'FOK'
+        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif)
         sendorder()
         print(create_order_result.data)
         print(create_order_result.headers)
         orderid = create_order_result.data['order']['id']
         time.sleep(1)
         get_order_by_id_result = client.private.get_order_by_id(orderid)
+        print(get_order_by_id_result.data)
+        print(get_order_by_id_result.headers)
         orderstatus = get_order_by_id_result.data['order']['status']
         print(orderstatus)
 elif command == 'buyusdc':
@@ -165,14 +210,7 @@ elif command == 'buyusdc':
         orderside = 'BUY'
         ordertype = constants.ORDER_TYPE_MARKET
         if simpleorderbook == 'y':
-                r = get(url = my_api_host+'/v3/markets')
-                r.raise_for_status()
-                if r.status_code == 200:
-                        for key, value in r.json()['markets'].items():
-                                if key == dydxmarket:
-                                        dydxstepsize = value['stepSize']
-                else:
-                        print('Bad requests status code:', r.status_code)
+                getstepsize()
         else:
                 dydxstepsize = os.popen("tail -1 /mnt/"+ramdiskpath+"/dydxmarketdata/"+dydxmarket+"/stepSize").read()[:-1]
         dydxquantity = float(argv[4]) / float(bestbid)
@@ -181,12 +219,15 @@ elif command == 'buyusdc':
         orderprice = str(float(bestask) * 2)
         orderexpiration = epoch_seconds_to_iso(time.time() + 70)
         ordertif = 'FOK'
+        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif)
         sendorder()
         print(create_order_result.data)
         print(create_order_result.headers)
         orderid = create_order_result.data['order']['id']
         time.sleep(1)
         get_order_by_id_result = client.private.get_order_by_id(orderid)
+        print(get_order_by_id_result.data)
+        print(get_order_by_id_result.headers)
         orderstatus = get_order_by_id_result.data['order']['status']
         print(orderstatus)
 elif command == 'sellusdc':
@@ -199,15 +240,8 @@ elif command == 'sellusdc':
         orderside = 'SELL'
         ordertype = constants.ORDER_TYPE_MARKET
         if simpleorderbook == 'y':
-                r = get(url = my_api_host+'/v3/markets')
-                r.raise_for_status()
-                if r.status_code == 200:
-                        for key, value in r.json()['markets'].items():
-                                if key == dydxmarket:
-                                        dydxstepsize = value['stepSize']
-                                        dydxticksize = value['tickSize']
-                else:
-                        print('Bad requests status code:', r.status_code)
+                getticksize()
+                getstepsize()
         else:
                 dydxstepsize = os.popen("tail -1 /mnt/"+ramdiskpath+"/dydxmarketdata/"+dydxmarket+"/stepSize").read()[:-1]
                 dydxticksize = os.popen("tail -1 /mnt/"+ramdiskpath+"/dydxmarketdata/"+dydxmarket+"/tickSize").read()[:-1]
@@ -218,11 +252,21 @@ elif command == 'sellusdc':
         orderprice = '%g'%(orderprice - (orderprice % float(dydxticksize)))
         orderexpiration = epoch_seconds_to_iso(time.time() + 70)
         ordertif = 'FOK'
+        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif)
         sendorder()
         print(create_order_result.data)
         print(create_order_result.headers)
         orderid = create_order_result.data['order']['id']
         time.sleep(1)
         get_order_by_id_result = client.private.get_order_by_id(orderid)
+        print(get_order_by_id_result.data)
+        print(get_order_by_id_result.headers)
         orderstatus = get_order_by_id_result.data['order']['status']
         print(orderstatus)
+elif command == 'getorder':
+        if len(argv) < 3:
+                print('Error: Must specify orderid')
+                exit()
+        orderid = argv[3]
+        order = findorder()
+        print(order)
