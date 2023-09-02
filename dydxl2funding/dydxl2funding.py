@@ -1,9 +1,8 @@
 from dydx3 import Client
 from dydx3 import constants
-from pprint import PrettyPrinter
 from sys import argv
-
-pp = PrettyPrinter(width = 41, compact = True)
+import pprint
+pp = pprint.PrettyPrinter(width = 41, compact = True)
 
 my_api_network_id = str(constants.NETWORK_ID_MAINNET)
 #my_api_network_id is set to either str(constants.NETWORK_ID_MAINNET) or str(constants.NETWORK_ID_GOERLI)
