@@ -5,7 +5,6 @@ import sys
 import time
 from datetime import datetime
 from logging import handlers
-from pprint import PrettyPrinter
 from random import randint
 from websocket import create_connection
 
@@ -17,10 +16,10 @@ def openconnection():
         ws.send(json.dumps(api_data))
         api_data = ws.recv()
         api_data = json.loads(api_data)
-        pp.pprint(api_data)
+        print(api_data)
         api_data = ws.recv()
         api_data = json.loads(api_data)
-        pp.pprint(api_data)
+        print(api_data)
 
 def checkwidth(elementname, elementsize):
         global maxwidthindexPrice
@@ -75,7 +74,6 @@ def checkwidth(elementname, elementsize):
 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxv3markets.py')
 logger = logging.getLogger("Rotating Log")
 logger.setLevel(logging.INFO)
-pp = PrettyPrinter(width = 41, compact = True)
 if sys.platform == "linux" or sys.platform == "linux2":
         # linux
         ramdiskpath = '/mnt/ramdisk'
