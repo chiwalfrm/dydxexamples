@@ -17,17 +17,15 @@ NC = '\033[0m' # No Color
 REDWHITE = '\033[0;31m\u001b[47m'
 GREENWHITE = '\033[0;32m\u001b[47m'
 
-workingdir=os.path.dirname(__file__)
-if workingdir == '':
-        workingdir = '.'
+workingdir=os.path.dirname(os.path.abspath(__file__))
 if len(argv) < 2:
-        print("Error: Must specify marketusd.")
-        exit()
-marketusd = argv[1]
-if len(argv) > 2:
-        depth = int(argv[2])
+        marketusd = 'BTC-USD'
 else:
+        marketusd = argv[1]
+if len(argv) < 3:
         depth = 10
+else:
+        depth = int(argv[2])
 if len(argv) > 3:
         ansimode = argv[3]
 else:
@@ -46,15 +44,13 @@ while True:
                 get_orderbook_result = client.public.get_orderbook(
                         market=marketusd,
                 )
-                askarray = []
                 askarray = get_orderbook_result.data['asks']
-                bidarray = []
                 bidarray = get_orderbook_result.data['bids']
                 count = 0
                 bidsizetotal = 0
                 asksizetotal = 0
                 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Last trade:', get_trades_result.data['trades'][0]['createdAt'], get_trades_result.data['trades'][0]['price'], get_trades_result.data['trades'][0]['side'], get_trades_result.data['trades'][0]['size'])
-                print('Bid'+' '.ljust(widthprice+widthsize+             1)+'| Ask')
+                print('Bid'+' '.ljust(widthprice+widthsize+1)+'| Ask')
                 while count < min(depth, max(len(bidarray), len(askarray))):
                         if count < len(bidarray):
                                 biditemprice = float(bidarray[count]['price'])
@@ -69,12 +65,12 @@ while True:
                                 askitemprice = ''
                                 askitemsize = ''
                         if biditemsize != '':
-                                bidsizetotal = bidsizetotal + biditemsize
+                                bidsizetotal += biditemsize
                                 biditemsizet = '('+str(biditemsize)+')'
                         else:
                                 biditemsizet = ''
                         if askitemsize != '':
-                                asksizetotal = asksizetotal + askitemsize
+                                asksizetotal += askitemsize
                                 askitemsizet = '('+str(askitemsize)+')'
                         else:
                                 askitemsizet = ''
