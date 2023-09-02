@@ -3,7 +3,7 @@ import signal
 import sys
 import time
 from datetime import datetime
-from pprint import PrettyPrinter
+remove_crossed_prices = True
 
 widthmarketstats = 24
 widthprice = 10
@@ -44,9 +44,7 @@ def checkmarketdata(file):
                         element1 = ' '+fname[1]+' '+fname[2]
                 print(file.ljust(15)+':', element0[:widthmarketstats].ljust(widthmarketstats)+element1)
 
-pp = PrettyPrinter(width = 41, compact = True)
 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxob2.py')
-pid = os.getpid()
 sep = " "
 signal.signal(signal.SIGINT, handler)
 if len(sys.argv) < 2:
@@ -121,11 +119,11 @@ while True:
                                 ftime = fname[4]
                                 bidarray.append([line, fbidsize, fbidoffset, fdate, ftime])
         if len(bidarray) == 0 or len(askarray) == 0:
-                print('Warning: asks or bids empty', str(len(bidarray)), str(len(askarray)), datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                print('Warning: bids or asks empty', str(len(bidarray)), str(len(askarray)), datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 fp = open(ramdiskpath+'/'+market+'/TRAPemptyarrays', "a")
                 fp.write(str(len(bidarray))+','+str(len(askarray))+',0,'+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                 fp.close()
-                if os.path.isfile(os.path.dirname(__file__)+'/'+market+'/EXITFLAG'):
+                if os.path.isfile(os.path.dirname(os.path.abspath(__file__))+'/'+market+'/EXITFLAG'):
                         sys.exit()
                 elif os.path.isfile(ramdiskpath+'/'+market+'/EXITFLAG') == True:
                         os.system('rm '+ramdiskpath+'/'+market+'/EXITFLAG')
@@ -133,43 +131,44 @@ while True:
                 else:
                         time.sleep(1)
                         continue
-        highestbidprice = 0
-        lowestaskprice = 0
-        while len(bidarray) > 0 and len(askarray) > 0 and ( highestbidprice == 0 or highestbidprice >= lowestaskprice ):
-                highestbid = bidarray[0]
-                lowestask = askarray[0]
-                highestbidprice = float(highestbid[0])
-                lowestaskprice = float(lowestask[0])
-                highestbidsize = float(highestbid[1])
-                lowestasksize = float(lowestask[1])
-                highestbidoffset = int(highestbid[2])
-                lowestaskoffset = int(lowestask[2])
-                if highestbidprice >= lowestaskprice:
-                        if highestbidoffset < lowestaskoffset:
-                                bidarray.pop(0)
-                        elif highestbidoffset > lowestaskoffset:
-                                askarray.pop(0)
-                        else:
-                                fp = open(ramdiskpath+'/'+market+'/TRAPsameoffset', "a")
-                                fp.write(str(highestbidprice)+','+str(lowestaskprice)+','+str(highestbidoffset)+','+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
-                                fp.close()
-                                if highestbidsize < lowestasksize:
+        if remove_crossed_prices == True:
+                highestbidprice = 0
+                lowestaskprice = 0
+                while len(bidarray) > 0 and len(askarray) > 0 and ( highestbidprice == 0 or highestbidprice >= lowestaskprice ):
+                        highestbid = bidarray[0]
+                        lowestask = askarray[0]
+                        highestbidprice = float(highestbid[0])
+                        lowestaskprice = float(lowestask[0])
+                        highestbidsize = float(highestbid[1])
+                        lowestasksize = float(lowestask[1])
+                        highestbidoffset = int(highestbid[2])
+                        lowestaskoffset = int(lowestask[2])
+                        if highestbidprice >= lowestaskprice:
+                                if highestbidoffset < lowestaskoffset:
                                         bidarray.pop(0)
-                                else:
+                                elif highestbidoffset > lowestaskoffset:
                                         askarray.pop(0)
-        if len(bidarray) == 0 or len(askarray) == 0:
-                print('Warning: asks or bids empty', str(len(bidarray)), str(len(askarray)), datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                fp = open(ramdiskpath+'/'+market+'/TRAPemptyarrays', "a")
-                fp.write(str(len(bidarray))+','+str(len(askarray))+',1,'+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
-                fp.close()
-                if os.path.isfile(os.path.dirname(__file__)+'/'+market+'/EXITFLAG'):
-                        sys.exit()
-                elif os.path.isfile(ramdiskpath+'/'+market+'/EXITFLAG') == True:
-                        os.system('rm '+ramdiskpath+'/'+market+'/EXITFLAG')
-                        sys.exit()
-                else:
-                        time.sleep(1)
-                        continue
+                                else:
+                                        fp = open(ramdiskpath+'/'+market+'/TRAPsameoffset', "a")
+                                        fp.write(str(highestbidprice)+','+str(lowestaskprice)+','+str(highestbidoffset)+','+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                                        fp.close()
+                                        if highestbidsize < lowestasksize:
+                                                bidarray.pop(0)
+                                        else:
+                                                askarray.pop(0)
+                if len(bidarray) == 0 or len(askarray) == 0:
+                        print('Warning: bids or asks empty', str(len(bidarray)), str(len(askarray)), datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                        fp = open(ramdiskpath+'/'+market+'/TRAPemptyarrays', "a")
+                        fp.write(str(len(bidarray))+','+str(len(askarray))+',1,'+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
+                        fp.close()
+                        if os.path.isfile(os.path.dirname(os.path.abspath(__file__))+'/'+market+'/EXITFLAG'):
+                                sys.exit()
+                        elif os.path.isfile(ramdiskpath+'/'+market+'/EXITFLAG') == True:
+                                os.system('rm '+ramdiskpath+'/'+market+'/EXITFLAG')
+                                sys.exit()
+                        else:
+                                time.sleep(1)
+                                continue
         count = 0
         highestoffset = 0
         lowestoffset = 0
@@ -276,7 +275,7 @@ while True:
         checkmarketdata('volume24H')
         endtime = datetime.now()
         print('Runtime        :' , endtime - starttime)
-        if os.path.isfile(os.path.dirname(__file__)+'/'+market+'/EXITFLAG'):
+        if os.path.isfile(os.path.dirname(os.path.abspath(__file__))+'/'+market+'/EXITFLAG'):
                 sys.exit()
         elif os.path.isfile(ramdiskpath+'/'+market+'/EXITFLAG') == True:
                 os.system('rm '+ramdiskpath+'/'+market+'/EXITFLAG')
