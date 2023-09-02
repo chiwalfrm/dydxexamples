@@ -5,7 +5,6 @@ import sys
 import time
 from datetime import datetime
 from logging import handlers
-from pprint import PrettyPrinter
 from random import randint
 from websocket import create_connection
 
@@ -72,7 +71,7 @@ def openconnection():
         ws.send(json.dumps(api_data))
         api_data = ws.recv()
         api_data = json.loads(api_data)
-        pp.pprint(api_data)
+        print(api_data)
         api_data = ws.recv()
         api_data = json.loads(api_data)
         asks = api_data['contents']['asks']
@@ -109,7 +108,6 @@ def checkwidth(elementname, elementsize):
 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' dydxob.py')
 logger = logging.getLogger("Rotating Log")
 logger.setLevel(logging.INFO)
-pp = PrettyPrinter(width = 41, compact = True)
 if sys.platform == "linux" or sys.platform == "linux2":
         # linux
         ramdiskpath = '/mnt/ramdisk'
@@ -149,11 +147,11 @@ while True:
                 api_data = json.loads(api_data)
                 asks = api_data['contents']['asks']
                 bids = api_data['contents']['bids']
-                offset = api_data['contents']['offset']
+                askoffset = api_data['contents']['offset']
+                bidoffset = api_data['contents']['offset']
                 if asks != []:
                         for askitem in asks:
                                 askprice = askitem[0]
-                                askoffset = offset
                                 asksize = askitem[1]
                                 checkaskfiles()
                                 checkwidth('price', len(askprice))
@@ -161,7 +159,6 @@ while True:
                 if bids != []:
                         for biditem in bids:
                                 bidprice = biditem[0]
-                                bidoffset = offset
                                 bidsize = biditem[1]
                                 checkbidfiles()
                                 checkwidth('price', len(bidprice))
