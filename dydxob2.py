@@ -251,12 +251,16 @@ while True:
                 else:
                         biditemoffset = ' '+str(biditemoffset).ljust(widthoffset)
                         askitemoffset = ' '+str(askitemoffset).ljust(widthoffset)
-                print(str(biditemprice).ljust(widthprice), biditemsizet.ljust(widthsize+2)+biditemoffsett.rjust(widthoffset)+biditemdate+biditemtime+' | '+str(askitemprice).ljust(widthprice), askitemsizet.ljust(widthsize+2)+askitemoffsett.rjust(widthoffset)+askitemdate+askitemtime, end = '\r')
+                if biditemprice == '':
+                        padding=' '.ljust(20)
+                else:
+                        padding=''
+                print(str(biditemprice).ljust(widthprice), biditemsizet.ljust(widthsize+2)+biditemoffsett.rjust(widthoffset)+biditemdate+biditemtime+padding+' | '+str(askitemprice).ljust(widthprice), askitemsizet.ljust(widthsize+2)+askitemoffsett.rjust(widthoffset)+askitemdate+askitemtime, end = '\r')
                 if sys.argv[-1] != 'noansi' and fcreatedat != 0:
                         if biditemprice == float(fprice):
                                 print(f"{REDWHITE}{biditemprice}{NC}", end = '\r')
                         elif askitemprice == float(fprice):
-                                print(str(biditemprice).ljust(widthprice), biditemsizet.ljust(widthsize+2)+biditemoffsett.rjust(widthoffset)+biditemdate+biditemtime+' | '+GREENWHITE+str(askitemprice)+NC, end = '\r')
+                                print(str(biditemprice).ljust(widthprice), biditemsizet.ljust(widthsize+2)+biditemoffsett.rjust(widthoffset)+biditemdate+biditemtime+padding+' | '+GREENWHITE+str(askitemprice)+NC, end = '\r')
                 print()
                 count += 1
         print('maxbid   :', highestbidprice)
