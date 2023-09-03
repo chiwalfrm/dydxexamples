@@ -260,7 +260,13 @@ while True:
                 print()
                 count += 1
         print('maxbid   :', highestbidprice)
-        print('minask   :', lowestaskprice, '(+'+'{0:.4f}'.format(lowestaskprice - highestbidprice)+')', '{0:.4f}'.format((lowestaskprice - highestbidprice) / highestbidprice * 100)+'%')
+        if '{0:.4f}'.format(lowestaskprice - highestbidprice)[:1] != '-':
+                plussign = '+'
+                crossmsg = ''
+        else:
+                plussign = ''
+                crossmsg = ' *** CROSSED PRICES ***'
+        print('minask   :', lowestaskprice, '('+plussign+'{0:.4f}'.format(lowestaskprice - highestbidprice)+')', '{0:.4f}'.format((lowestaskprice - highestbidprice) / highestbidprice * 100)+'%'+crossmsg)
         print('bidvolume:', bidsizetotal)
         print('askvolume:', asksizetotal)
         print('minoffset:', lowestoffset)
