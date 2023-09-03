@@ -253,7 +253,7 @@ while True:
                         biditemoffset = ' '+str(biditemoffset).ljust(widthoffset)
                         askitemoffset = ' '+str(askitemoffset).ljust(widthoffset)
                 if biditemprice == '':
-                        padding='                    '
+                        padding=' '.ljust(20)
                 else:
                         padding=''
                 print(str(biditemprice).ljust(widthprice), biditemsizet.ljust(widthsize+2)+biditemoffsett.rjust(widthoffset)+biditemdate+biditemtime+padding+' | '+str(askitemprice).ljust(widthprice), askitemsizet.ljust(widthsize+2)+askitemoffsett.rjust(widthoffset)+askitemdate+askitemtime, end = '\r')
