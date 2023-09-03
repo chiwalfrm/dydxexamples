@@ -252,16 +252,26 @@ while True:
                 else:
                         biditemoffset = ' '+str(biditemoffset).ljust(widthoffset)
                         askitemoffset = ' '+str(askitemoffset).ljust(widthoffset)
-                print(str(biditemprice).ljust(widthprice), biditemsizet.ljust(widthsize+2)+biditemoffsett.rjust(widthoffset)+biditemdate+biditemtime+' | '+str(askitemprice).ljust(widthprice), askitemsizet.ljust(widthsize+2)+askitemoffsett.rjust(widthoffset)+askitemdate+askitemtime, end = '\r')
+                if biditemprice == '':
+                        padding='                    '
+                else:
+                        padding=''
+                print(str(biditemprice).ljust(widthprice), biditemsizet.ljust(widthsize+2)+biditemoffsett.rjust(widthoffset)+biditemdate+biditemtime+padding+' | '+str(askitemprice).ljust(widthprice), askitemsizet.ljust(widthsize+2)+askitemoffsett.rjust(widthoffset)+askitemdate+askitemtime, end = '\r')
                 if sys.argv[-1] != 'noansi' and fcreatedat != 0:
                         if biditemprice == float(fprice):
                                 print(f"{REDWHITE}{biditemprice}{NC}", end = '\r')
                         elif askitemprice == float(fprice):
-                                print(str(biditemprice).ljust(widthprice), biditemsizet.ljust(widthsize+2)+biditemoffsett.rjust(widthoffset)+biditemdate+biditemtime+' | '+GREENWHITE+str(askitemprice)+NC, end = '\r')
+                                print(str(biditemprice).ljust(widthprice), biditemsizet.ljust(widthsize+2)+biditemoffsett.rjust(widthoffset)+biditemdate+biditemtime+padding+' | '+GREENWHITE+str(askitemprice)+NC, end = '\r')
                 print()
                 count += 1
         print('maxbid   :', highestbidprice)
-        print('minask   :', lowestaskprice, '(+'+'{0:.4f}'.format(lowestaskprice - highestbidprice)+')', '{0:.4f}'.format((lowestaskprice - highestbidprice) / highestbidprice * 100)+'%')
+        if '{0:.4f}'.format(lowestaskprice - highestbidprice)[:1] != '-':
+                plussign = '+'
+                crossmsg = ''
+        else:
+                plussign = ''
+                crossmsg = ' *** CROSSED PRICES ***'
+        print('minask   :', lowestaskprice, '('+plussign+'{0:.4f}'.format(lowestaskprice - highestbidprice)+')', '{0:.4f}'.format((lowestaskprice - highestbidprice) / highestbidprice * 100)+'%'+crossmsg)
         print('bidvolume:', bidsizetotal)
         print('askvolume:', asksizetotal)
         print('minoffset:', lowestoffset)
