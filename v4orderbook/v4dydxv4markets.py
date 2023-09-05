@@ -20,84 +20,198 @@ def openconnection():
         api_data = ws.recv()
         api_data = json.loads(api_data)
         print(api_data)
-        api_data = ws.recv()
-        api_data = json.loads(api_data)
-        print(api_data)
 
-def checkwidth(elementname, elementsize):
+def checkwidth(
+        framdiskpath,
+        fmarket,
+        felementname,
+        felementsize
+):
 #       global maxwidthindexPrice
 #       global maxwidthnextFundingAt
         global maxwidthnextFundingRate
         global maxwidthopenInterest
-#       global maxwidthoraclePrice
+        global maxwidthoraclePrice
         global maxwidthpriceChange24H
         global maxwidthtrades24H
         global maxwidthvolume24H
         global maxwidtheffectiveAt
         global maxwidtheffectiveAtHeight
         global maxwidthmarketId
-        global maxwidthprice
-#       if elementname == 'indexPrice' and elementsize > maxwidthindexPrice:
-#               fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-#               fp.write(str(elementsize)+'\n')
+        global maxwidthatomicResolution
+        global maxwidthbaseAsset
+        global maxwidthbasePositionNotional
+        global maxwidthbasePositionSize
+        global maxwidthclobPairId
+        global maxwidthincrementalPositionSize
+        global maxwidthinitialMarginFraction
+        global maxwidthlastPrice
+        global maxwidthmaintenanceMarginFraction
+        global maxwidthmaxPositionSize
+        global maxwidthminOrderBaseQuantums
+        global maxwidthquantumConversionExponent
+        global maxwidthquoteAsset
+        global maxwidthstatus
+        global maxwidthstepBaseQuantums
+        global maxwidthstepSize
+        global maxwidthsubticksPerTick
+        global maxwidthticker
+        global maxwidthtickSize
+        if felementsize == 0:
+                return None
+#       elif felementname == 'indexPrice' and felementsize > maxwidthindexPrice:
+#               fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+#               fp.write(str(felementsize)+'\n')
 #               fp.close()
-#               maxwidthindexPrice = elementsize
-#       elif elementname == 'nextFundingAt' and elementsize > maxwidthnextFundingAt:
-#               fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-#               fp.write(str(elementsize)+'\n')
+#               maxwidthindexPrice = felementsize
+#       elif felementname == 'nextFundingAt' and felementsize > maxwidthnextFundingAt:
+#               fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+#               fp.write(str(felementsize)+'\n')
 #               fp.close()
-#               maxwidthnextFundingAt = elementsize
-        if elementname == 'nextFundingRate' and elementsize > maxwidthnextFundingRate:
-                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-                fp.write(str(elementsize)+'\n')
+#               maxwidthnextFundingAt = felementsize
+        elif felementname == 'nextFundingRate' and felementsize > maxwidthnextFundingRate:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
                 fp.close()
-                maxwidthnextFundingRate = elementsize
-        elif elementname == 'openInterest' and elementsize > maxwidthopenInterest:
-                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-                fp.write(str(elementsize)+'\n')
+                maxwidthnextFundingRate = felementsize
+        elif felementname == 'openInterest' and felementsize > maxwidthopenInterest:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
                 fp.close()
-                maxwidthopenInterest = elementsize
-#       elif elementname == 'oraclePrice' and elementsize > maxwidthoraclePrice:
-#               fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-#               fp.write(str(elementsize)+'\n')
-#               fp.close()
-#               maxwidthoraclePrice = elementsize
-        elif elementname == 'priceChange24H' and elementsize > maxwidthpriceChange24H:
-                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-                fp.write(str(elementsize)+'\n')
+                maxwidthopenInterest = felementsize
+        elif felementname == 'oraclePrice' and felementsize > maxwidthoraclePrice:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
                 fp.close()
-                maxwidthpriceChange24H = elementsize
-        elif elementname == 'trades24H' and elementsize > maxwidthtrades24H:
-                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-                fp.write(str(elementsize)+'\n')
+                maxwidthoraclePrice = felementsize
+        elif felementname == 'priceChange24H' and felementsize > maxwidthpriceChange24H:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
                 fp.close()
-                maxwidthtrades24H = elementsize
-        elif elementname == 'volume24H' and elementsize > maxwidthvolume24H:
-                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-                fp.write(str(elementsize)+'\n')
+                maxwidthpriceChange24H = felementsize
+        elif felementname == 'trades24H' and felementsize > maxwidthtrades24H:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
                 fp.close()
-                maxwidthvolume24H = elementsize
-        elif elementname == 'effectiveAt' and elementsize > maxwidtheffectiveAt:
-                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-                fp.write(str(elementsize)+'\n')
+                maxwidthtrades24H = felementsize
+        elif felementname == 'volume24H' and felementsize > maxwidthvolume24H:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
                 fp.close()
-                maxwidtheffectiveAt = elementsize
-        elif elementname == 'effectiveAtHeight' and elementsize > maxwidtheffectiveAtHeight:
-                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-                fp.write(str(elementsize)+'\n')
+                maxwidthvolume24H = felementsize
+        elif felementname == 'effectiveAt' and felementsize > maxwidtheffectiveAt:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
                 fp.close()
-                maxwidtheffectiveAtHeight = elementsize
-        elif elementname == 'marketId' and elementsize > maxwidthmarketId:
-                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-                fp.write(str(elementsize)+'\n')
+                maxwidtheffectiveAt = felementsize
+        elif felementname == 'effectiveAtHeight' and felementsize > maxwidtheffectiveAtHeight:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
                 fp.close()
-                maxwidthmarketId = elementsize
-        elif elementname == 'price' and elementsize > maxwidthprice:
-                fp = open(ramdiskpath+'/maxwidth'+elementname, "w")
-                fp.write(str(elementsize)+'\n')
+                maxwidtheffectiveAtHeight = felementsize
+        elif felementname == 'marketId' and felementsize > maxwidthmarketId:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
                 fp.close()
-                maxwidthprice = elementsize
-        elif elementname not in [
+                maxwidthmarketId = felementsize
+        elif felementname == 'atomicResolution' and felementsize > maxwidthatomicResolution:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'baseAsset' and felementsize > maxwidthbaseAsset:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'basePositionNotional' and felementsize > maxwidthbasePositionNotional:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'basePositionSize' and felementsize > maxwidthbasePositionSize:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'clobPairId' and felementsize > maxwidthclobPairId:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'incrementalPositionSize' and felementsize > maxwidthincrementalPositionSize:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'initialMarginFraction' and felementsize > maxwidthinitialMarginFraction:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'lastPrice' and felementsize > maxwidthlastPrice:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'maintenanceMarginFraction' and felementsize > maxwidthmaintenanceMarginFraction:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'maxPositionSize' and felementsize > maxwidthmaxPositionSize:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'minOrderBaseQuantums' and felementsize > maxwidthminOrderBaseQuantums:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'quantumConversionExponent' and felementsize > maxwidthquantumConversionExponent:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'quoteAsset' and felementsize > maxwidthquoteAsset:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'status' and felementsize > maxwidthstatus:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'stepBaseQuantums' and felementsize > maxwidthstepBaseQuantums:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'stepSize' and felementsize > maxwidthstepSize:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'subticksPerTick' and felementsize > maxwidthsubticksPerTick:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'ticker' and felementsize > maxwidthticker:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname == 'tickSize' and felementsize > maxwidthtickSize:
+                fp = open(framdiskpath+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
+                fp.close()
+                maxwidthprice = felementsize
+        elif felementname not in [
+                'price',
+                'size',
                 'nextFundingRate',
                 'openInterest',
                 'priceChange24H',
@@ -106,21 +220,50 @@ def checkwidth(elementname, elementsize):
                 'effectiveAt',
                 'effectiveAtHeight',
                 'marketId',
-                'price'
+                'oraclePrice',
+                'atomicResolution',
+                'baseAsset',
+                'basePositionNotional',
+                'basePositionSize',
+                'clobPairId',
+                'incrementalPositionSize',
+                'initialMarginFraction',
+                'lastPrice',
+                'maintenanceMarginFraction',
+                'maxPositionSize',
+                'minOrderBaseQuantums',
+                'quantumConversionExponent',
+                'quoteAsset',
+                'status',
+                'stepBaseQuantums',
+                'stepSize',
+                'subticksPerTick',
+                'ticker',
+                'tickSize',
         ]:
-                fp = open(ramdiskpath+'/maxwidthgeneric', "a")
-                fp.write(elementname+' '+str(elementsize)+'\n')
+                fp = open(framdiskpath+'/maxwidthgeneric', "a")
+                fp.write(felementname+' '+str(felementsize)+'\n')
                 fp.close()
 
-def processcontentsdict():
-        for market, marketdata in contentsdict.items():
-                if os.path.isdir(ramdiskpath+'/'+market) == False:
-                        os.system('mkdir -p '+ramdiskpath+'/'+market)
+def processcontentsdict(
+        framdiskpath,
+        fcontentsdict
+):
+        for market, marketdata in fcontentsdict.items():
+                if os.path.isdir(framdiskpath+'/'+market) == False:
+                        os.system('mkdir -p '+framdiskpath+'/'+market)
                 for marketdataelement, marketdatavalue in marketdata.items():
-                        fp = open(ramdiskpath+'/'+market+'/'+marketdataelement, "w")
+                        if marketdataelement == 'price':
+                                marketdataelement = 'oraclePrice'
+                        fp = open(framdiskpath+'/'+market+'/'+marketdataelement, "w")
                         fp.write(str(marketdatavalue)+' '+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\n')
                         fp.close()
-                        checkwidth(marketdataelement, len(str(marketdatavalue)))
+                        checkwidth(
+                                framdiskpath = framdiskpath,
+                                fmarket = market,
+                                felementname = marketdataelement,
+                                felementsize = len(str(marketdatavalue))
+                        )
 
 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' v4dydxv4markets.py')
 logger = logging.getLogger("Rotating Log")
@@ -148,30 +291,94 @@ if os.path.ismount(ramdiskpath) == False:
 #maxwidthnextFundingAt = 0
 maxwidthnextFundingRate = 0
 maxwidthopenInterest = 0
-#maxwidthoraclePrice = 0
+maxwidthoraclePrice = 0
 maxwidthpriceChange24H = 0
 maxwidthtrades24H = 0
 maxwidthvolume24H = 0
 maxwidtheffectiveAt = 0
 maxwidtheffectiveAtHeight = 0
 maxwidthmarketId = 0
-maxwidthprice = 0
+maxwidthatomicResolution = 0
+maxwidthbaseAsset = 0
+maxwidthbasePositionNotional = 0
+maxwidthbasePositionSize = 0
+maxwidthclobPairId = 0
+maxwidthincrementalPositionSize = 0
+maxwidthinitialMarginFraction = 0
+maxwidthlastPrice = 0
+maxwidthmaintenanceMarginFraction = 0
+maxwidthmaxPositionSize = 0
+maxwidthminOrderBaseQuantums = 0
+maxwidthquantumConversionExponent = 0
+maxwidthquoteAsset = 0
+maxwidthstatus = 0
+maxwidthstepBaseQuantums = 0
+maxwidthstepSize = 0
+maxwidthsubticksPerTick = 0
+maxwidthticker = 0
+maxwidthtickSize = 0
 openconnection()
 while True:
         try:
-                global contentsdict
                 api_data = ws.recv()
                 api_data = json.loads(api_data)
-                logger.info("{'timestamp': '"+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'}")
-                logger.info(api_data)
-                if 'trading' in api_data['contents'].keys():
-                        contentsdict = api_data['contents']['trading']
-                        processcontentsdict()
-                elif 'oraclePrices' in api_data['contents'].keys():
-                        contentsdict = api_data['contents']['oraclePrices']
-                        processcontentsdict()
-                else:
-                        print(api_data['contents'])
+                if isinstance(api_data['contents'], dict):
+                        if 'markets' in api_data['contents'].keys():
+                                processcontentsdict(
+                                        framdiskpath = ramdiskpath,
+                                        fcontentsdict = api_data['contents']['markets']
+                                )
+                                logger.info("{'timestamp': '"+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'} (markets)")
+                                logger.info(api_data['contents']['markets'])
+                        elif 'trading' in api_data['contents'].keys():
+                                processcontentsdict(
+                                        framdiskpath = ramdiskpath,
+                                        fcontentsdict = api_data['contents']['trading']
+                                )
+                                logger.info("{'timestamp': '"+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'} (trading)")
+                                logger.info(api_data['contents']['trading'])
+                        elif 'oraclePrices' in api_data['contents'].keys():
+                                processcontentsdict(
+                                        framdiskpath = ramdiskpath,
+                                        fcontentsdict = api_data['contents']['oraclePrices']
+                                )
+                                logger.info("{'timestamp': '"+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'} (oraclePrices)")
+                                logger.info(api_data['contents']['oraclePrices'])
+                        else:
+                                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+" === v4_markets key not handled ===")
+                                print(api_data['contents'].keys)
+                                logger.info("{'timestamp': '"+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'} (OTHER)")
+                                logger.info(api_data['contents'])
+                        logger.info("{'timestamp': '"+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'} (DICT)")
+                        logger.info(api_data)
+                elif isinstance(api_data['contents'], list):
+                        for item in api_data['contents']:
+                                if 'markets' in item.keys():
+                                        processcontentsdict(
+                                                framdiskpath = ramdiskpath,
+                                                fcontentsdict = item['markets']
+                                        )
+                                        logger.info("{'timestamp': '"+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'} (markets)")
+                                        logger.info(item['markets'])
+                                if 'trading' in item.keys():
+                                        processcontentsdict(
+                                                framdiskpath = ramdiskpath,
+                                                fcontentsdict = item['trading']
+                                        )
+                                        logger.info("{'timestamp': '"+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'} (trading)")
+                                        logger.info(item['trading'])
+                                elif 'oraclePrices' in item.keys():
+                                        processcontentsdict(
+                                                framdiskpath = ramdiskpath,
+                                                fcontentsdict = item['oraclePrices']
+                                )
+                                        logger.info("{'timestamp': '"+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'} (oraclePrices)")
+                                        logger.info(item['oraclePrices'])
+                                else:
+                                        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+" === v4_markets key not handled ===")
+                                        print(item.keys())
+                                        logger.info("{'timestamp': '"+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"'} (OTHER)")
+                                        logger.info(item)
         except KeyboardInterrupt:
                 ws.close()
                 sys.exit(0)
