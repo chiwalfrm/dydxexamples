@@ -22,23 +22,25 @@ def openconnection():
         api_data = ws.recv()
         api_data = json.loads(api_data)
         print(api_data)
-        api_data = ws.recv()
-        api_data = json.loads(api_data)
-        print(api_data)
 
-def checkwidth(elementname, elementsize):
+def checkwidth(
+        framdiskpath,
+        fmarket,
+        felementname,
+        felementsize
+):
         global maxwidthtradeprice
         global maxwidthtradesize
-        if elementname == 'tradeprice' and elementsize > maxwidthtradeprice:
-                fp = open(ramdiskpath+'/'+market+'/maxwidth'+elementname, "w")
-                fp.write(str(elementsize)+'\n')
+        if felementname == 'tradeprice' and felementsize > maxwidthtradeprice:
+                fp = open(framdiskpath+'/'+fmarket+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
                 fp.close()
-                maxwidthtradeprice = elementsize
-        elif elementname == 'tradesize' and elementsize > maxwidthtradesize:
-                fp = open(ramdiskpath+'/'+market+'/maxwidth'+elementname, "w")
-                fp.write(str(elementsize)+'\n')
+                maxwidthtradeprice = felementsize
+        elif felementname == 'tradesize' and felementsize > maxwidthtradesize:
+                fp = open(framdiskpath+'/'+fmarket+'/maxwidth'+felementname, "w")
+                fp.write(str(felementsize)+'\n')
                 fp.close()
-                maxwidthtradesize = elementsize
+                maxwidthtradesize = felementsize
 
 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' v4dydxtrades.py')
 logger = logging.getLogger("Rotating Log")
@@ -73,34 +75,54 @@ maxwidthtradesize = 0
 openconnection()
 while True:
         try:
-                trades = api_data['contents']['trades'][0]
-                tradecreatedat = trades['createdAt']
-                if 'createdAtHeight' in trades.keys():
-                        tradecreatedatheight = trades['createdAtHeight']
-                else:
-                        tradecreatedatheight = 'N/A'
-                if 'liquidation' in trades.keys():
-                        tradeliquidation = trades['liquidation']
-                else:
-                        tradeliquidation = False
-                tradeprice = trades['price']
-                tradeside = trades['side']
-                tradesize = trades['size']
-                if tradeliquidation == True:
-                        liquidationstring = 'L'
-                        fp = open(ramdiskpath+'/'+market+'/liquidations', "a")
-                        fp.write(tradecreatedat+' '+tradecreatedatheight+' '+tradeprice+' '+tradeside+' ('+tradesize+')L\n')
-                        fp.close()
-                else:
-                        liquidationstring = ''
-                fp = open(ramdiskpath+'/'+market+'/lasttrade', "w")
-                fp.write(tradecreatedat+' '+tradecreatedatheight+' '+tradeprice+' '+tradeside+' ('+tradesize+')'+liquidationstring+'\n')
-                fp.close()
-                logger.info(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' '+tradecreatedat+' '+tradecreatedatheight+' '+tradeprice+' '+tradeside.ljust(4)+' ('+tradesize+')'+liquidationstring)
-                checkwidth('tradeprice', len(tradeprice))
-                checkwidth('tradesize', len(tradesize))
                 api_data = ws.recv()
                 api_data = json.loads(api_data)
+                trades = []
+                if isinstance(api_data['contents'], dict):
+                        tradelist = api_data['contents']['trades']
+                        for tradeitem in tradelist:
+                                trades.append(tradeitem)
+                elif isinstance(api_data['contents'], list):
+                        for trade in api_data['contents']:
+                                for tradeitem in trade['trades']:
+                                        trades.append(tradeitem)
+                for trade in trades:
+                        tradecreatedat = trade['createdAt']
+                        if 'createdAtHeight' in trade.keys():
+                                tradecreatedatheight = trade['createdAtHeight']
+                        else:
+                                tradecreatedatheight = 'N/A'
+                        tradeid = trade['id']
+                        tradeprice = trade['price']
+                        tradeside = trade['side']
+                        tradesize = trade['size']
+                        if 'liquidation' in trade.keys():
+                                tradeliquidation = trade['liquidation']
+                        else:
+                                tradeliquidation = False
+                        if tradeliquidation == True:
+                                liquidationstring = 'L'
+                                fp = open(ramdiskpath+'/'+market+'/liquidations', "a")
+                                fp.write(tradecreatedat+' '+tradecreatedatheight+' '+tradeprice+' '+tradeside+' ('+tradesize+')L\n')
+                                fp.close()
+                        else:
+                                liquidationstring = ''
+                        fp = open(ramdiskpath+'/'+market+'/lasttrade', "w")
+                        fp.write(tradecreatedat+' '+tradecreatedatheight+' '+tradeprice+' '+tradeside+' ('+tradesize+')'+liquidationstring+'\n')
+                        fp.close()
+                        logger.info(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' '+market+' '+tradecreatedat+' '+tradecreatedatheight+' '+tradeprice+' '+tradeside.ljust(4)+' ('+tradesize+')'+liquidationstring)
+                        checkwidth(
+                                framdiskpath = ramdiskpath,
+                                fmarket = market,
+                                felementname = 'tradeprice',
+                                felementsize = len(tradeprice)
+                        )
+                        checkwidth(
+                                framdiskpath = ramdiskpath,
+                                fmarket = market,
+                                felementname = 'tradesize',
+                                felementsize = len(tradesize)
+                        )
         except KeyboardInterrupt:
                 ws.close()
                 sys.exit(0)
