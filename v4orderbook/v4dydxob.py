@@ -9,9 +9,6 @@ from random import randint
 from websocket import create_connection
 WSINDEXERURL = 'wss://indexer.v4testnet2.dydx.exchange/v4/ws'
 
-import pprint
-pp = pprint.PrettyPrinter(width = 41, compact = True)
-
 def checkaskfiles(
         framdiskpath,
         fmarket,
