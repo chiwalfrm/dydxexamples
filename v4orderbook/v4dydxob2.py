@@ -42,7 +42,13 @@ def checkmarketdata(file):
                         element1 = ''
                 else:
                         element1 = ' '+fname[1]+' '+fname[2]
-                print(file.ljust(15)[:15]+':', element0[:widthmarketstats].ljust(widthmarketstats)+element1)
+                if file == 'effectiveAtHeight':
+                        filet = 'effectiveAtHeig'
+                elif file == 'price':
+                        filet = 'oraclePrice'
+                else:
+                        filet = file
+                print(filet.ljust(15)+':', element0[:widthmarketstats].ljust(widthmarketstats)+element1)
 
 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' v4dydxob2.py')
 sep = " "
