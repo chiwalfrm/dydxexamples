@@ -8,7 +8,7 @@ from random import randrange
 from requests import get
 from sys import argv, maxsize
 
-sys.path.insert(0, '/home/vmware/extra/v4-clients/v4-client-py')
+sys.path.insert(0, 'v4-clients/v4-client-py')
 from v4_client_py import chain
 from v4_client_py import clients
 from v4_client_py.clients.constants import Network
