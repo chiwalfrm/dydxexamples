@@ -8,7 +8,7 @@ from random import randrange
 from requests import get
 from sys import argv, maxsize
 
-sys.path.insert(0, 'v4-clients/v4-client-py')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))+'/v4-clients/v4-client-py')
 from v4_client_py import chain
 from v4_client_py import clients
 from v4_client_py.clients.constants import Network
@@ -21,8 +21,8 @@ counterlimit = 10
 
 ########################## YOU FILL THIS OUT #################
 DYDX_TEST_MNEMONIC = '<FILL_THIS_OUT>'
-#INDEXERURL = 'https://indexer.dydx.trade/v4'
-INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
+INDEXERURL = 'https://indexer.dydx.trade/v4'
+#INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
 ##############################################################
 
 #ordermarket/orderside/ordertype/ordersize/orderprice/orderexpiration/ordertif/clientid/good_til_block_value
@@ -419,9 +419,9 @@ def getpositions3():
                                                                         topheight = r.json()['positions'][0]['createdAtHeight']
                                                                         newheight = r.json()['positions'][-1]['createdAtHeight']
                                                                         if topheight == newheight:
-                                                                                print('Error: more than 100 records with the same createdAtHeight', topheight)
-                                                                                #move to next subaccount
-                                                                                break
+                                                                               print('Error: more than 100 records with the same createdAtHeight', topheight)
+                                                                               #move to next subaccount
+                                                                               break
                                                                 for item in r.json()['positions']:
                                                                         print(walletaddress+':'+str(subaccountnumber), item['market'].ljust(9), item['size'])
                                                                 if int(newheight) < int(height):
@@ -552,11 +552,18 @@ elif command == 'buyquantity':
         print('response        :', place_order_result.response)
         print('contract_code_id:', place_order_result.contract_code_id)
         print('contract_address:', place_order_result.contract_address)
-        time.sleep(1)
         walletaddress = wallet.address
-#       order = findordera()
-        order = findorder2a()
-        print(order['status'])
+        counter2=0
+        while counter2 < 10:
+                try:
+#                       order = findordera()
+                        order = findorder2a()
+                        print(order['status'])
+                        break
+                except Exception as error:
+                        print('Waiting 1 second for order to be visible.')
+                        time.sleep(1)
+                counter2 += 1
 elif command == 'sellquantity':
         if len(argv) < 4:
                 print('Error: Must specify market, quantity')
@@ -582,11 +589,18 @@ elif command == 'sellquantity':
         print('response        :', place_order_result.response)
         print('contract_code_id:', place_order_result.contract_code_id)
         print('contract_address:', place_order_result.contract_address)
-        time.sleep(1)
         walletaddress = wallet.address
-#       order = findordera()
-        order = findorder2a()
-        print(order['status'])
+        counter2=0
+        while counter2 < 10:
+                try:
+#                       order = findordera()
+                        order = findorder2a()
+                        print(order['status'])
+                        break
+                except Exception as error:
+                        print('Waiting 1 second for order to be visible.')
+                        time.sleep(1)
+                counter2 += 1
 elif command == 'buyusdc':
         if len(argv) < 4:
                 print('Error: Must specify market, USDCquantity')
@@ -613,11 +627,18 @@ elif command == 'buyusdc':
         print('response        :', place_order_result.response)
         print('contract_code_id:', place_order_result.contract_code_id)
         print('contract_address:', place_order_result.contract_address)
-        time.sleep(1)
         walletaddress = wallet.address
-#       order = findordera()
-        order = findorder2a()
-        print(order['status'])
+        counter2=0
+        while counter2 < 10:
+                try:
+#                       order = findordera()
+                        order = findorder2a()
+                        print(order['status'])
+                        break
+                except Exception as error:
+                        print('Waiting 1 second for order to be visible.')
+                        time.sleep(1)
+                counter2 += 1
 elif command == 'sellusdc':
         if len(argv) < 4:
                 print('Error: Must specify market, USDCquantity')
@@ -646,11 +667,18 @@ elif command == 'sellusdc':
         print('response        :', place_order_result.response)
         print('contract_code_id:', place_order_result.contract_code_id)
         print('contract_address:', place_order_result.contract_address)
-        time.sleep(1)
         walletaddress = wallet.address
-#       order = findordera()
-        order = findorder2a()
-        print(order['status'])
+        counter2=0
+        while counter2 < 10:
+                try:
+#                       order = findordera()
+                        order = findorder2a()
+                        print(order['status'])
+                        break
+                except Exception as error:
+                        print('Waiting 1 second for order to be visible.')
+                        time.sleep(1)
+                counter2 += 1
 elif command == 'getorder':
         if len(argv) < 4:
                 print('Error: Must specify [short-term|long-term|both] clientid')
@@ -680,3 +708,69 @@ elif command == 'getorderid':
 #       order = findorderid()
         order = findorderid2()
         print(order)
+elif command == 'buyquantitylimit':
+        if len(argv) < 6:
+                print('Error: Must specify market, quantity, limit, seconds')
+                exit()
+        ordermarket = argv[3]
+        ordersize = float(argv[4])
+        orderprice = float(argv[5])
+        orderseconds = int(argv[6])
+        orderside = clients.helpers.chain_helpers.OrderSide.BUY
+        ordertype = clients.helpers.chain_helpers.OrderType.LIMIT
+        orderexpiration = orderseconds
+        ordertif = clients.helpers.chain_helpers.OrderTimeInForce.GTT
+        clientid = randrange(0, 2**31 - 1) #random number between 0 and max(int32) inclusive
+        good_til_block_value = 0
+        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
+        sendorder()
+        print('client_id       :', clientid)
+        print('tx_hash         :', place_order_result.tx_hash)
+        print('response        :', place_order_result.response)
+        print('contract_code_id:', place_order_result.contract_code_id)
+        print('contract_address:', place_order_result.contract_address)
+        walletaddress = wallet.address
+        counter2=0
+        while counter2 < 10:
+                try:
+#                       order = findorderb()
+                        order = findorder2b()
+                        print(order['status'])
+                        break
+                except Exception as error:
+                        print('Waiting 1 second for order to be visible.')
+                        time.sleep(1)
+                counter2 += 1
+elif command == 'sellquantitylimit':
+        if len(argv) < 6:
+                print('Error: Must specify market, quantity, limit, seconds')
+                exit()
+        ordermarket = argv[3]
+        ordersize = float(argv[4])
+        orderprice = float(argv[5])
+        orderseconds = int(argv[6])
+        orderside = clients.helpers.chain_helpers.OrderSide.SELL
+        ordertype = clients.helpers.chain_helpers.OrderType.LIMIT
+        orderexpiration = orderseconds
+        ordertif = clients.helpers.chain_helpers.OrderTimeInForce.GTT
+        clientid = randrange(0, 999999999) #random number between 0 and 999,999,999 inclusive
+        good_til_block_value = 0
+        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
+        sendorder()
+        print('client_id       :', clientid)
+        print('tx_hash         :', place_order_result.tx_hash)
+        print('response        :', place_order_result.response)
+        print('contract_code_id:', place_order_result.contract_code_id)
+        print('contract_address:', place_order_result.contract_address)
+        walletaddress = wallet.address
+        counter2=0
+        while counter2 < 10:
+                try:
+#                       order = findorderb()
+                        order = findorder2b()
+                        print(order['status'])
+                        break
+                except Exception as error:
+                        print('Waiting 1 second for order to be visible.')
+                        time.sleep(1)
+                counter2 += 1
