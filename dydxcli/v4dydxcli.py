@@ -21,8 +21,8 @@ counterlimit = 10
 
 ########################## YOU FILL THIS OUT #################
 DYDX_TEST_MNEMONIC = '<FILL_THIS_OUT>'
-#INDEXERURL = 'https://indexer.dydx.trade/v4'
-INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
+INDEXERURL = 'https://indexer.dydx.trade/v4'
+#INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
 ##############################################################
 
 #ordermarket/orderside/ordertype/ordersize/orderprice/orderexpiration/ordertif/clientid/good_til_block_value
@@ -539,7 +539,9 @@ elif command == 'buyquantity':
         orderside = clients.helpers.chain_helpers.OrderSide.BUY
         ordertype = clients.helpers.chain_helpers.OrderType.MARKET
         dydxmarket = ordermarket
-        getprices()
+        if getprices() == None:
+                print('Error: No such market', dydxmarket)
+                exit()
         orderprice = float(bestask) * 2
         orderexpiration = 0
         ordertif = clients.helpers.chain_helpers.OrderTimeInForce.GTT
@@ -577,8 +579,10 @@ elif command == 'sellquantity':
         orderside = clients.helpers.chain_helpers.OrderSide.SELL
         ordertype = clients.helpers.chain_helpers.OrderType.MARKET
         dydxmarket = ordermarket
+        if getprices() == None:
+                print('Error: No such market', dydxmarket)
+                exit()
         getticksize()
-        getprices()
         orderprice = float(bestbid) / 2
         orderprice = float('%g'%(orderprice - (orderprice % float(dydxticksize))))
         orderexpiration = 0
@@ -612,13 +616,16 @@ elif command == 'buyusdc':
         if len(argv) < 4:
                 print('Error: Must specify market, USDCquantity')
                 exit()
-        dydxmarket = argv[3]
-        getprices()
         ordermarket = argv[3]
+        usdcsize = argv[4]
         orderside = clients.helpers.chain_helpers.OrderSide.BUY
         ordertype = clients.helpers.chain_helpers.OrderType.MARKET
+        dydxmarket = ordermarket
+        if getprices() == None:
+                print('Error: No such market', dydxmarket)
+                exit()
         getstepsize()
-        dydxquantity = float(argv[4]) / float(bestbid)
+        dydxquantity = float(usdcsize) / float(bestbid)
         dydxquantity = float('%g'%(dydxquantity - (dydxquantity % float(dydxstepsize))))
         ordersize = dydxquantity
         orderprice = float(bestask) * 2
@@ -653,14 +660,17 @@ elif command == 'sellusdc':
         if len(argv) < 4:
                 print('Error: Must specify market, USDCquantity')
                 exit()
-        dydxmarket = argv[3]
-        getprices()
         ordermarket = argv[3]
+        usdcsize = argv[4]
         orderside = clients.helpers.chain_helpers.OrderSide.SELL
         ordertype = clients.helpers.chain_helpers.OrderType.MARKET
+        dydxmarket = ordermarket
+        if getprices() == None:
+                print('Error: No such market', dydxmarket)
+                exit()
         getticksize()
         getstepsize()
-        dydxquantity = float(argv[4]) / float(bestbid)
+        dydxquantity = float(usdcsize) / float(bestbid)
         dydxquantity = float('%g'%(dydxquantity - (dydxquantity % float(dydxstepsize))))
         ordersize = dydxquantity
         orderprice = float(bestbid) / 2
@@ -731,6 +741,10 @@ elif command == 'buyquantitylimit':
         orderseconds = int(argv[6])
         orderside = clients.helpers.chain_helpers.OrderSide.BUY
         ordertype = clients.helpers.chain_helpers.OrderType.LIMIT
+        dydxmarket = ordermarket
+        if getprices() == None:
+                print('Error: No such market', dydxmarket)
+                exit()
         orderexpiration = orderseconds
         ordertif = clients.helpers.chain_helpers.OrderTimeInForce.GTT
         clientid = randrange(0, 2**31 - 1) #random number between 0 and max(int32) inclusive
@@ -767,6 +781,10 @@ elif command == 'sellquantitylimit':
         orderseconds = int(argv[6])
         orderside = clients.helpers.chain_helpers.OrderSide.SELL
         ordertype = clients.helpers.chain_helpers.OrderType.LIMIT
+        dydxmarket = ordermarket
+        if getprices() == None:
+                print('Error: No such market', dydxmarket)
+                exit()
         orderexpiration = orderseconds
         ordertif = clients.helpers.chain_helpers.OrderTimeInForce.GTT
         clientid = randrange(0, 999999999) #random number between 0 and 999,999,999 inclusive
