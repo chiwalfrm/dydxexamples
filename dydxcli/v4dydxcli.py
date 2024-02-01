@@ -21,8 +21,8 @@ counterlimit = 10
 
 ########################## YOU FILL THIS OUT #################
 DYDX_TEST_MNEMONIC = '<FILL_THIS_OUT>'
-INDEXERURL = 'https://indexer.dydx.trade/v4'
-#INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
+#INDEXERURL = 'https://indexer.dydx.trade/v4'
+INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
 ##############################################################
 
 #ordermarket/orderside/ordertype/ordersize/orderprice/orderexpiration/ordertif/clientid/good_til_block_value
