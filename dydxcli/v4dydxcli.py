@@ -11,7 +11,7 @@ from sys import argv, maxsize
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))+'/v4-clients/v4-client-py')
 from v4_client_py import chain
 from v4_client_py import clients
-from v4_client_py.clients.constants import Network
+from v4_client_py.clients.constants import Network, CHAIN_ID
 MAX_CLIENT_ID = 2 ** 32 - 1
 
 import pprint
@@ -21,8 +21,6 @@ counterlimit = 10
 
 ########################## YOU FILL THIS OUT #################
 DYDX_TEST_MNEMONIC = '<FILL_THIS_OUT>'
-#INDEXERURL = 'https://indexer.dydx.trade/v4'
-INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
 ##############################################################
 
 #ordermarket/orderside/ordertype/ordersize/orderprice/orderexpiration/ordertif/clientid/good_til_block_value
@@ -496,6 +494,10 @@ def getpositions4():
 if len(argv) > 1 and path.isfile(argv[1]):
         exec(open(argv[1]).read())
 
+if CHAIN_ID == "dydx-testnet-4":
+        INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
+elif CHAIN_ID == "dydx-mainnet-1":
+        INDEXERURL = 'https://indexer.dydx.trade/v4'
 wallet = clients.Subaccount.from_mnemonic(DYDX_TEST_MNEMONIC)
 network = Network.config_network()
 client = clients.CompositeClient(
@@ -505,8 +507,6 @@ if len(argv) > 2:
         command = argv[2]
 else:
         command = 'balance'
-
-print('[INFO] You are using this indexer:', INDEXERURL)
 if command == 'balance':
 #note: two ways to get balance getbalance() and getbalance2()
         if len(argv) > 3:
@@ -813,4 +813,4 @@ elif command == 'sellquantitylimit':
                         time.sleep(1)
                 counter2 += 1
 else:
-        print('[INFO] Available commands: balance, positions, buyquantity, sellquantity, buyusdc, sellusdc, getorder, getorderid, buyquantitylimit, sellquantitylimit')
+        print('Available commands: balance, positions, buyquantity, sellquantity, buyusdc, sellusdc, getorder, getorderid, buyquantitylimit, sellquantitylimit')
