@@ -60,6 +60,7 @@ def getprices():
                         bestask = r.json()['asks'][0]['price']
                 else:
                         print('Bad requests status code:', r.status_code)
+                return 0
         except Exception as error:
                 print('getprices() Market not found', dydxmarket)
                 return None
