@@ -21,8 +21,8 @@ counterlimit = 10
 
 ########################## YOU FILL THIS OUT #################
 DYDX_TEST_MNEMONIC = '<FILL_THIS_OUT>'
-#INDEXERURL = 'https://indexer.dydx.trade/v4'
-INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
+INDEXERURL = 'https://indexer.dydx.trade/v4'
+#INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
 ##############################################################
 
 #ordermarket/orderside/ordertype/ordersize/orderprice/orderexpiration/ordertif/clientid/good_til_block_value
@@ -559,7 +559,10 @@ elif command == 'buyquantity':
 #                       order = findordera()
                         order = findorder2a()
                         print(order['status'])
-                        break
+                        if order['status'] == 'FILLED':
+                                break
+                        print('Waiting 1 second for order to be FILLED.')
+                        time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
                         time.sleep(1)
@@ -596,7 +599,10 @@ elif command == 'sellquantity':
 #                       order = findordera()
                         order = findorder2a()
                         print(order['status'])
-                        break
+                        if order['status'] == 'FILLED':
+                                break
+                        print('Waiting 1 second for order to be FILLED.')
+                        time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
                         time.sleep(1)
@@ -634,7 +640,10 @@ elif command == 'buyusdc':
 #                       order = findordera()
                         order = findorder2a()
                         print(order['status'])
-                        break
+                        if order['status'] == 'FILLED':
+                                break
+                        print('Waiting 1 second for order to be FILLED.')
+                        time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
                         time.sleep(1)
@@ -674,7 +683,10 @@ elif command == 'sellusdc':
 #                       order = findordera()
                         order = findorder2a()
                         print(order['status'])
-                        break
+                        if order['status'] == 'FILLED':
+                                break
+                        print('Waiting 1 second for order to be FILLED.')
+                        time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
                         time.sleep(1)
@@ -736,7 +748,10 @@ elif command == 'buyquantitylimit':
 #                       order = findorderb()
                         order = findorder2b()
                         print(order['status'])
-                        break
+                        if order['status'] == 'FILLED':
+                                break
+                        print('Waiting 1 second for order to be FILLED.')
+                        time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
                         time.sleep(1)
@@ -769,8 +784,13 @@ elif command == 'sellquantitylimit':
 #                       order = findorderb()
                         order = findorder2b()
                         print(order['status'])
-                        break
+                        if order['status'] == 'FILLED':
+                                break
+                        print('Waiting 1 second for order to be FILLED.')
+                        time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
                         time.sleep(1)
                 counter2 += 1
+else:
+        print('Error: Invalid command')
