@@ -21,8 +21,8 @@ counterlimit = 10
 
 ########################## YOU FILL THIS OUT #################
 DYDX_TEST_MNEMONIC = '<FILL_THIS_OUT>'
-#INDEXERURL = 'https://indexer.dydx.trade/v4'
-INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
+INDEXERURL = 'https://indexer.dydx.trade/v4'
+#INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
 ##############################################################
 
 #ordermarket/orderside/ordertype/ordersize/orderprice/orderexpiration/ordertif/clientid/good_til_block_value
@@ -61,7 +61,7 @@ def getprices():
                 else:
                         print('Bad requests status code:', r.status_code)
         except Exception as error:
-                print('Market not found', dydxmarket)
+                print('getprices() Market not found', dydxmarket)
                 return None
 
 #dydxmarket
@@ -77,7 +77,7 @@ def getticksize():
                 else:
                         print('Bad requests status code:', r.status_code)
         except Exception as error:
-                print('Market not found', dydxmarket)
+                print('getticksize() Market not found', dydxmarket)
                 return None
 
 #dydxmarket
@@ -93,7 +93,7 @@ def getstepsize():
                 else:
                         print('Bad requests status code:', r.status_code)
         except Exception as error:
-                print('Market not found', dydxmarket)
+                print('getstepsize() Market not found', dydxmarket)
                 return None
 
 #clientid
@@ -146,7 +146,7 @@ def findordera():
                                         #no results, move to next subaccount
                                         break
                         except Exception as error:
-                                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
+                                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "findordera() api query failed (%s)" % error)
                                 return None
 
 #clientid
@@ -193,7 +193,7 @@ def findorderb():
                                         #no results, move to next subaccount
                                         break
                         except Exception as error:
-                                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
+                                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "findorderb() api query failed (%s)" % error)
                                 return None
 
 #clientid
@@ -250,10 +250,10 @@ def findorder2a():
                                                 #no results, move to next subaccount
                                                 break
                                 else:
-                                        print('Bad requests status code:', r.status_code)
+                                        print('findorder2a() Bad requests status code:', r.status_code)
                                         return None
                         except Exception as error:
-                                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
+                                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "findorder2a() api query failed (%s)" % error)
                                 return None
 
 #clientid
@@ -302,10 +302,10 @@ def findorder2b():
                                                 #no results, move to next subaccount
                                                 break
                                 else:
-                                        print('Bad requests status code:', r.status_code)
+                                        print('findorder2b() Bad requests status code:', r.status_code)
                                         return None
                         except Exception as error:
-                                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
+                                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "findorder2b() api query failed (%s)" % error)
                                 return None
 
 #orderid
@@ -326,7 +326,7 @@ def findorderid2():
                 else:
                         print('Bad requests status code:', r.status_code)
         except Exception as error:
-                print('Order not found', orderid)
+                print('findorderid2() Order not found', orderid)
                 return None
 
 #walletaddress
@@ -342,7 +342,7 @@ def getsubaccounts():
                 else:
                         print('Bad requests status code:', r.status_code)
         except Exception as error:
-                print('Address not found', walletaddress)
+                print('getsubaccounts() Address not found', walletaddress)
                 return None
 
 #walletaddress
