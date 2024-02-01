@@ -21,8 +21,8 @@ counterlimit = 10
 
 ########################## YOU FILL THIS OUT #################
 DYDX_TEST_MNEMONIC = '<FILL_THIS_OUT>'
-INDEXERURL = 'https://indexer.dydx.trade/v4'
-#INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
+#INDEXERURL = 'https://indexer.dydx.trade/v4'
+INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
 ##############################################################
 
 #ordermarket/orderside/ordertype/ordersize/orderprice/orderexpiration/ordertif/clientid/good_til_block_value
@@ -419,9 +419,9 @@ def getpositions3():
                                                                         topheight = r.json()['positions'][0]['createdAtHeight']
                                                                         newheight = r.json()['positions'][-1]['createdAtHeight']
                                                                         if topheight == newheight:
-                                                                               print('Error: more than 100 records with the same createdAtHeight', topheight)
-                                                                               #move to next subaccount
-                                                                               break
+                                                                                print('Error: more than 100 records with the same createdAtHeight', topheight)
+                                                                                #move to next subaccount
+                                                                                break
                                                                 for item in r.json()['positions']:
                                                                         print(walletaddress+':'+str(subaccountnumber), item['market'].ljust(9), item['size'])
                                                                 if int(newheight) < int(height):
@@ -505,6 +505,7 @@ if len(argv) > 2:
 else:
         command = 'balance'
 
+print('You are using this indexer:', INDEXERURL)
 if command == 'balance':
 #note: two ways to get balance getbalance() and getbalance2()
         if len(argv) > 3:
@@ -793,4 +794,4 @@ elif command == 'sellquantitylimit':
                         time.sleep(1)
                 counter2 += 1
 else:
-        print('Error: Invalid command')
+        print('Available commands: balance, positions, buyquantity, sellquantity, buyusdc, sellusdc, getorder, getorderid, buyquantitylimit, sellquantitylimit')
