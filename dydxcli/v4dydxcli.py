@@ -505,7 +505,7 @@ if len(argv) > 2:
 else:
         command = 'balance'
 
-print('You are using this indexer:', INDEXERURL)
+print('[INFO] You are using this indexer:', INDEXERURL)
 if command == 'balance':
 #note: two ways to get balance getbalance() and getbalance2()
         if len(argv) > 3:
@@ -794,4 +794,4 @@ elif command == 'sellquantitylimit':
                         time.sleep(1)
                 counter2 += 1
 else:
-        print('Available commands: balance, positions, buyquantity, sellquantity, buyusdc, sellusdc, getorder, getorderid, buyquantitylimit, sellquantitylimit')
+        print('[INFO] Available commands: balance, positions, buyquantity, sellquantity, buyusdc, sellusdc, getorder, getorderid, buyquantitylimit, sellquantitylimit')
