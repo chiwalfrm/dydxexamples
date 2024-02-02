@@ -105,7 +105,7 @@ def findorder():
 
 def findordera():
         counter = 0
-        print('Searching short-term orders...')
+        print('findordera() Searching short-term orders...')
         subaccountlist = getsubaccounts()
         for subaccountnumber in subaccountlist:
                 if len(subaccountlist) > 1:
@@ -117,12 +117,21 @@ def findordera():
                                 #reached counterlimit, move to next subaccount
                                 break
                         try:
-                                get_subaccount_orders_result = client.indexer_client.account.get_subaccount_orders(
-                                        address = walletaddress,
-                                        subaccount_number = subaccountnumber,
-                                        good_til_block_before_or_at = height,
-                                        return_latest_orders = True
-                                )
+                                if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                        get_subaccount_orders_result = client.indexer_client.account.get_subaccount_orders(
+                                                address = walletaddress,
+                                                subaccount_number = subaccountnumber,
+                                                good_til_block_before_or_at = height,
+                                                return_latest_orders = True,
+                                                status = clientid
+                                        )
+                                else:
+                                        get_subaccount_orders_result = client.indexer_client.account.get_subaccount_orders(
+                                                address = walletaddress,
+                                                subaccount_number = subaccountnumber,
+                                                good_til_block_before_or_at = height,
+                                                return_latest_orders = True,
+                                        )
                                 if len(get_subaccount_orders_result.data) > 0:
                                         if len(get_subaccount_orders_result.data) > 1:
                                                 topheight = get_subaccount_orders_result.data[0]['createdAtHeight']
@@ -132,8 +141,11 @@ def findordera():
                                                         #move to next subaccount
                                                         break
                                         for item in get_subaccount_orders_result.data:
-                                                if item['clientId'] == str(clientid):
-                                                        return item
+                                                if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                                        print(item)
+                                                else:
+                                                        if item['clientId'] == str(clientid):
+                                                                return item
                                         if int(newheight) < height:
                                                 height = int(newheight) - 1
                                                 newheight = 0
@@ -152,7 +164,7 @@ def findordera():
 #walletaddress
 def findorderb():
         counter = 0
-        print('Searching long-term orders...')
+        print('findorderb() Searching long-term orders...')
         subaccountlist = getsubaccounts()
         for subaccountnumber in subaccountlist:
                 if len(subaccountlist) > 1:
@@ -164,12 +176,21 @@ def findorderb():
                                 #reached counterlimit, move to next subaccount
                                 break
                         try:
-                                get_subaccount_orders_result = client.indexer_client.account.get_subaccount_orders(
-                                        address = walletaddress,
-                                        subaccount_number = subaccountnumber,
-                                        good_til_block_time_before_or_at = datetime.utcfromtimestamp(height).isoformat()[:-3]+'Z',
-                                        return_latest_orders = True
-                                )
+                                if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                        get_subaccount_orders_result = client.indexer_client.account.get_subaccount_orders(
+                                                address = walletaddress,
+                                                subaccount_number = subaccountnumber,
+                                                good_til_block_time_before_or_at = datetime.utcfromtimestamp(height).isoformat()[:-3]+'Z',
+                                                return_latest_orders = True,
+                                                status = clientid
+                                        )
+                                else:
+                                        get_subaccount_orders_result = client.indexer_client.account.get_subaccount_orders(
+                                                address = walletaddress,
+                                                subaccount_number = subaccountnumber,
+                                                good_til_block_time_before_or_at = datetime.utcfromtimestamp(height).isoformat()[:-3]+'Z',
+                                                return_latest_orders = True,
+                                        )
                                 if len(get_subaccount_orders_result.data) > 0:
                                         if len(get_subaccount_orders_result.data) > 1:
                                                 topheight = isoparse(get_subaccount_orders_result.data[0]['goodTilBlockTime']).timestamp()
@@ -179,8 +200,11 @@ def findorderb():
                                                         #move to next subaccount
                                                         break
                                         for item in get_subaccount_orders_result.data:
-                                                if item['clientId'] == str(clientid):
-                                                        return item
+                                                if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                                        print(item)
+                                                else:
+                                                        if item['clientId'] == str(clientid):
+                                                                return item
                                         if newheight < height:
                                                 height = newheight - 0.001
                                                 newheight = 0
@@ -207,7 +231,7 @@ def findorder2():
 #walletaddress
 def findorder2a():
         counter = 0
-        print('Searching short-term orders...')
+        print('findorder2a() Searching short-term orders...')
         subaccountlist = getsubaccounts()
         for subaccountnumber in subaccountlist:
                 if len(subaccountlist) > 1:
@@ -218,12 +242,22 @@ def findorder2a():
                         if counter > counterlimit:
                                 #reached counterlimit, move to next subaccount
                                 break
-                        r = get(INDEXERURL+'/orders', params = {
-                                'address': walletaddress,
-                                'subaccountNumber': subaccountnumber,
-                                'return_latest_orders': True,
-                                'goodTilBlockBeforeOrAt': height,
-                        })
+                        if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                r = get(INDEXERURL+'/orders', params = {
+                                        'address': walletaddress,
+                                        'subaccountNumber': subaccountnumber,
+                                        'return_latest_orders': True,
+                                        'goodTilBlockBeforeOrAt': height,
+                                        'status': clientid
+                                })
+                        else:
+                                r = get(INDEXERURL+'/orders', params = {
+                                        'address': walletaddress,
+                                        'subaccountNumber': subaccountnumber,
+                                        'return_latest_orders': True,
+                                        'goodTilBlockBeforeOrAt': height,
+                                })
+
                         try:
                                 r.raise_for_status()
                                 if r.status_code == 200:
@@ -236,8 +270,11 @@ def findorder2a():
                                                                 #move to next subaccount
                                                                 break
                                                 for item in r.json():
-                                                        if item['clientId'] == str(clientid):
-                                                                return item
+                                                        if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                                                print(item)
+                                                        else:
+                                                                if item['clientId'] == str(clientid):
+                                                                        return item
                                                 if int(newheight) < height:
                                                         height = int(newheight) - 1
                                                         newheight = 0
@@ -259,7 +296,7 @@ def findorder2a():
 #walletaddress
 def findorder2b():
         counter = 0
-        print('Searching long-term orders...')
+        print('findorder2b() Searching long-term orders...')
         subaccountlist = getsubaccounts()
         for subaccountnumber in subaccountlist:
                 if len(subaccountlist) > 1:
@@ -270,12 +307,21 @@ def findorder2b():
                         if counter > counterlimit:
                                 #reached counterlimit, move to next subaccount
                                 break
-                        r = get(INDEXERURL+'/orders', params = {
-                                'address': walletaddress,
-                                'subaccountNumber': subaccountnumber,
-                                'return_latest_orders': True,
-                                'goodTilBlockTimeBeforeOrAt': datetime.utcfromtimestamp(height).isoformat()[:-3]+'Z',
-                        })
+                        if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                r = get(INDEXERURL+'/orders', params = {
+                                        'address': walletaddress,
+                                        'subaccountNumber': subaccountnumber,
+                                        'return_latest_orders': True,
+                                        'goodTilBlockTimeBeforeOrAt': datetime.utcfromtimestamp(height).isoformat()[:-3]+'Z',
+                                        'status': clientid
+                                })
+                        else:
+                                r = get(INDEXERURL+'/orders', params = {
+                                        'address': walletaddress,
+                                        'subaccountNumber': subaccountnumber,
+                                        'return_latest_orders': True,
+                                        'goodTilBlockTimeBeforeOrAt': datetime.utcfromtimestamp(height).isoformat()[:-3]+'Z',
+                                })
                         try:
                                 r.raise_for_status()
                                 if r.status_code == 200:
@@ -288,8 +334,11 @@ def findorder2b():
                                                                 #move to next subaccount
                                                                 break
                                                 for item in r.json():
-                                                        if item['clientId'] == str(clientid):
-                                                                return item
+                                                        if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                                                print(item)
+                                                        else:
+                                                                if item['clientId'] == str(clientid):
+                                                                        return item
                                                 if newheight < height:
                                                         height = newheight - 0.001
                                                         newheight = 0
@@ -710,6 +759,7 @@ elif command == 'sellusdc':
 elif command == 'getorder':
         if len(argv) < 4:
                 print('Error: Must specify [short-term|long-term|both] clientid')
+                print('clientid can also be a status such as OPEN, FILLED, CANCELED, or UNTRIGGERED')
                 exit()
         elif len(argv) > 4:
                 searchtype = argv[3]
