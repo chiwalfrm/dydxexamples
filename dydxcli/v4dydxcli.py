@@ -563,9 +563,10 @@ elif command == 'buyquantity':
 #                       order = findordera()
                         order = findorder2a()
                         print(order['status'])
-                        if order['status'] == 'FILLED':
+#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
+                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
                                 break
-                        print('Waiting 1 second for order to be FILLED.')
+                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
                         time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
@@ -605,9 +606,10 @@ elif command == 'sellquantity':
 #                       order = findordera()
                         order = findorder2a()
                         print(order['status'])
-                        if order['status'] == 'FILLED':
+#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
+                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
                                 break
-                        print('Waiting 1 second for order to be FILLED.')
+                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
                         time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
@@ -649,9 +651,10 @@ elif command == 'buyusdc':
 #                       order = findordera()
                         order = findorder2a()
                         print(order['status'])
-                        if order['status'] == 'FILLED':
+#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
+                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
                                 break
-                        print('Waiting 1 second for order to be FILLED.')
+                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
                         time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
@@ -695,9 +698,10 @@ elif command == 'sellusdc':
 #                       order = findordera()
                         order = findorder2a()
                         print(order['status'])
-                        if order['status'] == 'FILLED':
+#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
+                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
                                 break
-                        print('Waiting 1 second for order to be FILLED.')
+                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
                         time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
@@ -764,9 +768,10 @@ elif command == 'buyquantitylimit':
 #                       order = findorderb()
                         order = findorder2b()
                         print(order['status'])
-                        if order['status'] == 'FILLED':
+#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
+                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
                                 break
-                        print('Waiting 1 second for order to be FILLED.')
+                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
                         time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
@@ -804,9 +809,10 @@ elif command == 'sellquantitylimit':
 #                       order = findorderb()
                         order = findorder2b()
                         print(order['status'])
-                        if order['status'] == 'FILLED':
+#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
+                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
                                 break
-                        print('Waiting 1 second for order to be FILLED.')
+                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
                         time.sleep(1)
                 except Exception as error:
                         print('Waiting 1 second for order to be visible.')
