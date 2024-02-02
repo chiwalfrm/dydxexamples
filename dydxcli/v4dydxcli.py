@@ -110,7 +110,9 @@ def findordera():
         for subaccountnumber in subaccountlist:
                 if len(subaccountlist) > 1:
                         print('Searching subaccount', str(subaccountnumber)+'...')
-                height = maxsize
+#               height = maxsize
+#               height limited to 2147483647 for 32-bit OS, equivalent to 2038-01-19T03:14Z
+                height = 2147483647
                 newheight = 0
                 while newheight < height:
                         if counter > counterlimit:
@@ -236,7 +238,9 @@ def findorder2a():
         for subaccountnumber in subaccountlist:
                 if len(subaccountlist) > 1:
                         print('Searching subaccount', str(subaccountnumber)+'...')
-                height = maxsize
+#               height = maxsize
+#               height limited to 2147483647 for 32-bit OS, equivalent to 2038-01-19T03:14Z
+                height = 2147483647
                 newheight = 0
                 while newheight < height:
                         if counter > counterlimit:
