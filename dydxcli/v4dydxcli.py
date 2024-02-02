@@ -548,9 +548,14 @@ def getpositions4():
                 except Exception as error:
                         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
 
-if len(argv) > 1 and path.isfile(argv[1]):
+if len(argv) < 2:
+        print('Error: Must specify <apikeyfile>')
+        exit()
+if path.isfile(argv[1]):
         exec(open(argv[1]).read())
-
+else:
+        print('Error:', argv[1], 'is not found, or not a file')
+        exit()
 if CHAIN_ID == "dydx-testnet-4":
         INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
 elif CHAIN_ID == "dydx-mainnet-1":
