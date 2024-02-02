@@ -589,8 +589,9 @@ elif command == 'positions':
 #               getpositions3()
                 getpositions4()
 elif command == 'buyquantity':
-        if len(argv) < 4:
+        if len(argv) < 5:
                 print('Error: Must specify market, quantity')
+                print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 0.1')
                 exit()
         ordermarket = argv[3]
         ordersize = float(argv[4])
@@ -630,8 +631,9 @@ elif command == 'buyquantity':
                         time.sleep(1)
                 counter2 += 1
 elif command == 'sellquantity':
-        if len(argv) < 4:
+        if len(argv) < 5:
                 print('Error: Must specify market, quantity')
+                print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 0.1')
                 exit()
         ordermarket = argv[3]
         ordersize = float(argv[4])
@@ -673,8 +675,9 @@ elif command == 'sellquantity':
                         time.sleep(1)
                 counter2 += 1
 elif command == 'buyusdc':
-        if len(argv) < 4:
+        if len(argv) < 5:
                 print('Error: Must specify market, USDCquantity')
+                print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 1000')
                 exit()
         ordermarket = argv[3]
         usdcsize = argv[4]
@@ -718,8 +721,9 @@ elif command == 'buyusdc':
                         time.sleep(1)
                 counter2 += 1
 elif command == 'sellusdc':
-        if len(argv) < 4:
+        if len(argv) < 5:
                 print('Error: Must specify market, USDCquantity')
+                print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 1000')
                 exit()
         ordermarket = argv[3]
         usdcsize = argv[4]
@@ -795,8 +799,9 @@ elif command == 'getorderid':
         order = findorderid2()
         print(order)
 elif command == 'buyquantitylimit':
-        if len(argv) < 6:
+        if len(argv) < 7:
                 print('Error: Must specify market, quantity, limit, seconds')
+                print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 0.1 4000 6000')
                 exit()
         ordermarket = argv[3]
         ordersize = float(argv[4])
@@ -836,8 +841,9 @@ elif command == 'buyquantitylimit':
                         time.sleep(1)
                 counter2 += 1
 elif command == 'sellquantitylimit':
-        if len(argv) < 6:
+        if len(argv) < 7:
                 print('Error: Must specify market, quantity, limit, seconds')
+                print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 0.1 400000 6000')
                 exit()
         ordermarket = argv[3]
         ordersize = float(argv[4])
