@@ -1,4 +1,12 @@
 #!/bin/sh
+
+sendnotification()
+{
+# this section is to send notification on trades and errors
+# put your own code here
+        echo
+}
+
 datestart=`date +%s`
 WORKINGDIR=`dirname $0`
 if [ $# -eq 0 ]
@@ -12,10 +20,17 @@ then
         echo "Error: apikeyfile $apikeyfile not found"
         exit
 fi
-python3 $WORKINGDIR/dydxcli.py $apikeyfile positions > /tmp/closeallpositions.log$$
+if [ ! -z "$2" ]
+then
+        # close a specific market
+        python3 $WORKINGDIR/dydxcli.py $apikeyfile positions | grep "^$2 " > /tmp/closeallpositions.log$$
+else
+        # close all markets
+        python3 $WORKINGDIR/dydxcli.py $apikeyfile positions > /tmp/closeallpositions.log$$
+fi
 if [ ! -s /tmp/closeallpositions.log$$ ]
 then
-        echo "*** NO OPEN POSITIONS ***"
+        echo "*** NO OPEN POSITION(S) ***"
         exit
 fi
 cat /tmp/closeallpositions.log$$ | while read l1
@@ -26,8 +41,10 @@ do
         if [ "`echo $quantity | cut -c 1`" = '-' ]
         then
                 # close short position
-                echo "python3 $WORKINGDIR/dydx.py $apikeyfile buyquantity $dydxmarket ${quantity#-}"
-                python3 $WORKINGDIR/dydx.py $apikeyfile buyquantity $dydxmarket ${quantity#-} > /tmp/closeallpositions2.log$$
+                echo "python3 $WORKINGDIR/dydxcli.py $apikeyfile buyquantity $dydxmarket ${quantity#-}"
+                cd $WORKINGDIR
+                python3 $WORKINGDIR/dydxcli.py $apikeyfile buyquantity $dydxmarket ${quantity#-} > /tmp/closeallpositions2.log$$
+                cd -
                 if [ "`tail -1 /tmp/closeallpositions2.log$$`" != FILLED ]
                 then
                         echo "Error: Problem with order"
@@ -36,8 +53,10 @@ do
                 fi
         else
                 # close long position
-                echo "python3 $WORKINGDIR/dydx.py $apikeyfile buyquantity $dydxmarket $quantity"
-                python3 $WORKINGDIR/dydx.py $apikeyfile sellquantity $dydxmarket $quantity > /tmp/closeallpositions2.log$$
+                echo "python3 $WORKINGDIR/dydxcli.py $apikeyfile sellquantity $dydxmarket $quantity"
+                cd $WORKINGDIR
+                python3 $WORKINGDIR/dydxcli.py $apikeyfile sellquantity $dydxmarket $quantity > /tmp/closeallpositions2.log$$
+                cd -
                 if [ "`tail -1 /tmp/closeallpositions2.log$$`" != FILLED ]
                 then
                         echo "Error: Problem with order"
@@ -46,12 +65,12 @@ do
                 fi
         fi
 done
-python3 $WORKINGDIR/dydx.py $apikeyfile positions > /tmp/closeallpositions.log$$
+python3 $WORKINGDIR/dydxcli.py $apikeyfile positions > /tmp/closeallpositions.log$$
 if [ ! -s /tmp/closeallpositions.log$$ ]
 then
-        echo "*** ALL POSITIONS CLOSED ***"
+        echo "*** ALL POSITION(S) CLOSED ***"
 else
-        echo "Error: Some positions still open"
+        echo "Error: Some position(s) still open"
         cat /tmp/closeallpositions.log$$
 fi
 dateend=`date +%s`
