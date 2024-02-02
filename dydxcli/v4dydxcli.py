@@ -171,7 +171,9 @@ def findorderb():
         for subaccountnumber in subaccountlist:
                 if len(subaccountlist) > 1:
                         print('Searching subaccount', str(subaccountnumber)+'...')
-                height = isoparse('9999-12-31T23:59:59.999Z').timestamp()
+#               height = isoparse('9999-12-31T23:59:59.999Z').timestamp()
+#               height limited to 2147483647 for 32-bit OS, equivalent to 2038-01-19T03:14Z
+                height = isoparse('2038-01-19T03:14Z').timestamp()
                 newheight = 0
                 while newheight < height:
                         if counter > counterlimit:
@@ -305,7 +307,9 @@ def findorder2b():
         for subaccountnumber in subaccountlist:
                 if len(subaccountlist) > 1:
                         print('Searching subaccount', str(subaccountnumber)+'...')
-                height = isoparse('9999-12-31T23:59:59.999Z').timestamp()
+#               height = isoparse('9999-12-31T23:59:59.999Z').timestamp()
+#               height limited to 2147483647 for 32-bit OS, equivalent to 2038-01-19T03:14Z
+                height = isoparse('2038-01-19T03:14Z').timestamp()
                 newheight = 0
                 while newheight < height:
                         if counter > counterlimit:
