@@ -1,4 +1,4 @@
-#Example shell command: while true; do clear; python3 ./v4checkmarkets.py BTC-USD ETH-USD LINK-USD MATIC-USD; sleep 15; done
+#Example shell command: while true; do clear; python3 ./v4getprices.py BTC-USD ETH-USD LINK-USD MATIC-USD; sleep 15; done
 from requests import get
 from sys import argv
 #INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
