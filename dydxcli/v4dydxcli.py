@@ -9,28 +9,27 @@ from requests import get
 from sys import argv, maxsize
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))+'/v4-clients/v4-client-py')
-from v4_client_py import chain
 from v4_client_py import clients
+from v4_client_py.clients import constants
 from v4_client_py.clients.constants import Network, CHAIN_ID
-MAX_CLIENT_ID = 2 ** 32 - 1
-
-import pprint
-pp = pprint.PrettyPrinter(width = 41, compact = True)
 
 counterlimit = 10
 
 ########################## YOU FILL THIS OUT #################
 DYDX_TEST_MNEMONIC = '<FILL_THIS_OUT>'
+simpleorderbook = 'y'
+#simpleorderbook should be set to 'y' unless you are running my orderbook software and the data is available in /mnt/<ramdisk>
+#https://github.com/chiwalfrm/dydxexamples/tree/main/v4orderbook
 ##############################################################
 
-#ordermarket/orderside/ordertype/ordersize/orderprice/orderexpiration/ordertif/clientid/good_til_block_value
+#dydxmarket/orderside/ordertype/ordersize/orderprice/orderexpiration/ordertif/clientid/good_til_block_value
 def sendorder():
         global place_order_result
         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' sendorder()')
         try:
                 place_order_result = client.place_order(
                         wallet,
-                        market = ordermarket,
+                        market = dydxmarket,
                         type = ordertype,
                         side = orderside,
                         price = orderprice,
@@ -48,52 +47,77 @@ def sendorder():
 
 #dydxmarket
 def getprices():
+        count = 0
         global bestbid
         global bestask
-        r = get(url = INDEXERURL+'/orderbooks/perpetualMarket/'+dydxmarket)
         try:
+                r = get(url = INDEXERURL+'/orderbooks/perpetualMarket/'+dydxmarket)
                 r.raise_for_status()
                 if r.status_code == 200:
                         bestbid = r.json()['bids'][0]['price']
                         bestask = r.json()['asks'][0]['price']
+                        return 0
                 else:
                         print('Bad requests status code:', r.status_code)
-                return 0
+                        count += 1
+                        if count > 9:
+                                print('getprices() Market not found', dydxmarket)
+                                return None
         except Exception as error:
-                print('getprices() Market not found', dydxmarket)
-                return None
+                count += 1
+                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
+                print('getprices() exception, will retry... count='+str(count))
+                if count > 9:
+                        print('getprices() Market not found', dydxmarket)
+                        return None
 
 #dydxmarket
 def getticksize():
-        global dydxticksize
-        r = get(url = INDEXERURL+'/perpetualMarkets', params = {
-                'ticker': dydxmarket
-        })
+        count = 0
         try:
+                r = get(url = INDEXERURL+'/perpetualMarkets', params = {
+                        'ticker': dydxmarket
+                })
                 r.raise_for_status()
                 if r.status_code == 200:
-                        dydxticksize = r.json()['markets'][dydxmarket]['tickSize']
+                        return r.json()['markets'][dydxmarket]['tickSize']
                 else:
                         print('Bad requests status code:', r.status_code)
+                        count += 1
+                        if count > 9:
+                                print('getticksize() Market not found', dydxmarket)
+                                return None
         except Exception as error:
-                print('getticksize() Market not found', dydxmarket)
-                return None
+                count += 1
+                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
+                print('getticksize() exception, will retry... count='+str(count))
+                if count > 9:
+                        print('getticksize() Market not found', dydxmarket)
+                        return None
 
 #dydxmarket
 def getstepsize():
-        global dydxstepsize
-        r = get(url = INDEXERURL+'/perpetualMarkets', params = {
-                'ticker': dydxmarket
-        })
+        count = 0
         try:
+                r = get(url = INDEXERURL+'/perpetualMarkets', params = {
+                        'ticker': dydxmarket
+                })
                 r.raise_for_status()
                 if r.status_code == 200:
-                        dydxstepsize = r.json()['markets'][dydxmarket]['stepSize']
+                        return r.json()['markets'][dydxmarket]['stepSize']
                 else:
                         print('Bad requests status code:', r.status_code)
+                        count += 1
+                        if count > 9:
+                                print('getstepsize() Market not found', dydxmarket)
+                                return None
         except Exception as error:
-                print('getstepsize() Market not found', dydxmarket)
-                return None
+                count += 1
+                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
+                print('getstepsize() exception, will retry... count='+str(count))
+                if count > 9:
+                        print('getstepsize() Market not found', dydxmarket)
+                        return None
 
 #clientid
 #walletaddress
@@ -119,7 +143,7 @@ def findordera():
                                 #reached counterlimit, move to next subaccount
                                 break
                         try:
-                                if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                if clientid == constants.ORDER_STATUS_OPEN or clientid == constants.ORDER_STATUS_FILLED or clientid == constants.ORDER_STATUS_CANCELED or clientid == constants.ORDER_STATUS_UNTRIGGERED:
                                         get_subaccount_orders_result = client.indexer_client.account.get_subaccount_orders(
                                                 address = walletaddress,
                                                 subaccount_number = subaccountnumber,
@@ -143,7 +167,7 @@ def findordera():
                                                         #move to next subaccount
                                                         break
                                         for item in get_subaccount_orders_result.data:
-                                                if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                                if clientid == constants.ORDER_STATUS_OPEN or clientid == constants.ORDER_STATUS_FILLED or clientid == constants.ORDER_STATUS_CANCELED or clientid == constants.ORDER_STATUS_UNTRIGGERED:
                                                         print(item)
                                                 else:
                                                         if item['clientId'] == str(clientid):
@@ -180,7 +204,7 @@ def findorderb():
                                 #reached counterlimit, move to next subaccount
                                 break
                         try:
-                                if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                if clientid == constants.ORDER_STATUS_OPEN or clientid == constants.ORDER_STATUS_FILLED or clientid == constants.ORDER_STATUS_CANCELED or clientid == constants.ORDER_STATUS_UNTRIGGERED:
                                         get_subaccount_orders_result = client.indexer_client.account.get_subaccount_orders(
                                                 address = walletaddress,
                                                 subaccount_number = subaccountnumber,
@@ -204,7 +228,7 @@ def findorderb():
                                                         #move to next subaccount
                                                         break
                                         for item in get_subaccount_orders_result.data:
-                                                if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                                if clientid == constants.ORDER_STATUS_OPEN or clientid == constants.ORDER_STATUS_FILLED or clientid == constants.ORDER_STATUS_CANCELED or clientid == constants.ORDER_STATUS_UNTRIGGERED:
                                                         print(item)
                                                 else:
                                                         if item['clientId'] == str(clientid):
@@ -248,7 +272,7 @@ def findorder2a():
                         if counter > counterlimit:
                                 #reached counterlimit, move to next subaccount
                                 break
-                        if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                        if clientid == constants.ORDER_STATUS_OPEN or clientid == constants.ORDER_STATUS_FILLED or clientid == constants.ORDER_STATUS_CANCELED or clientid == constants.ORDER_STATUS_UNTRIGGERED:
                                 r = get(INDEXERURL+'/orders', params = {
                                         'address': walletaddress,
                                         'subaccountNumber': subaccountnumber,
@@ -276,7 +300,7 @@ def findorder2a():
                                                                 #move to next subaccount
                                                                 break
                                                 for item in r.json():
-                                                        if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                                        if clientid == constants.ORDER_STATUS_OPEN or clientid == constants.ORDER_STATUS_FILLED or clientid == constants.ORDER_STATUS_CANCELED or clientid == constants.ORDER_STATUS_UNTRIGGERED:
                                                                 print(item)
                                                         else:
                                                                 if item['clientId'] == str(clientid):
@@ -301,6 +325,9 @@ def findorder2a():
 #clientid
 #walletaddress
 def findorder2b():
+        if command == 'cancelorder':
+                global itemlist
+                itemlist = []
         counter = 0
         print('findorder2b() Searching long-term orders...')
         subaccountlist = getsubaccounts()
@@ -315,7 +342,7 @@ def findorder2b():
                         if counter > counterlimit:
                                 #reached counterlimit, move to next subaccount
                                 break
-                        if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                        if clientid == constants.ORDER_STATUS_OPEN or clientid == constants.ORDER_STATUS_FILLED or clientid == constants.ORDER_STATUS_CANCELED or clientid == constants.ORDER_STATUS_UNTRIGGERED:
                                 r = get(INDEXERURL+'/orders', params = {
                                         'address': walletaddress,
                                         'subaccountNumber': subaccountnumber,
@@ -342,11 +369,15 @@ def findorder2b():
                                                                 #move to next subaccount
                                                                 break
                                                 for item in r.json():
-                                                        if clientid == 'OPEN' or clientid == 'FILLED' or clientid == 'CANCELED' or clientid == 'UNTRIGGERED':
+                                                        if clientid == constants.ORDER_STATUS_OPEN or clientid == constants.ORDER_STATUS_FILLED or clientid == constants.ORDER_STATUS_CANCELED or clientid == constants.ORDER_STATUS_UNTRIGGERED:
                                                                 print(item)
+                                                                if command == 'cancelorder':
+                                                                        itemlist.append(item)
                                                         else:
                                                                 if item['clientId'] == str(clientid):
                                                                         return item
+                                                if command == 'cancelorder':
+                                                        return itemlist
                                                 if newheight < height:
                                                         height = newheight - 0.001
                                                         newheight = 0
@@ -370,7 +401,8 @@ def findorderid():
                 get_order_result = client.indexer_client.account.get_order(orderid)
                 return get_order_result.data
         except Exception as error:
-                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
+                print('findorderid() Order not found', orderid)
+                return None
 
 #orderid
 def findorderid2():
@@ -406,7 +438,11 @@ def getbalance():
         try:
                 subaccounts_response = client.indexer_client.account.get_subaccounts(walletaddress)
                 for item in subaccounts_response.data['subaccounts']:
-                        print(item['address']+':'+str(item['subaccountNumber']), item['equity'])
+                        if subaccount == 'all':
+                                print(item['address']+':'+str(item['subaccountNumber']), item['equity'])
+                        elif int(subaccount) == item['subaccountNumber']:
+                                print(item['address']+':'+str(item['subaccountNumber']), item['equity'])
+                                return item['equity']
         except Exception as error:
                 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
 
@@ -416,7 +452,11 @@ def getbalance2():
         try:
                 if r.status_code == 200:
                         for item in r.json()['subaccounts']:
-                                print(item['address']+':'+str(item['subaccountNumber']), item['equity'])
+                                if subaccount == 'all':
+                                        print(item['address']+':'+str(item['subaccountNumber']), item['equity'])
+                                elif int(subaccount) == item['subaccountNumber']:
+                                        print(item['address']+':'+str(item['subaccountNumber']), item['equity'])
+                                        return item['equity']
                 else:
                         print('Bad requests status code:', r.status_code)
         except Exception as error:
@@ -464,7 +504,7 @@ def getpositions3():
                                         r = get(INDEXERURL+'/perpetualPositions', params = {
                                                 'address': walletaddress,
                                                 'subaccountNumber': subaccountnumber,
-                                                'status': 'OPEN',
+                                                'status': constants.ORDER_STATUS_OPEN,
                                                 'createdBeforeOrAtHeight': height
                                         })
                                         try:
@@ -518,7 +558,7 @@ def getpositions4():
                                                 get_subaccount_perpetual_positions_result = client.indexer_client.account.get_subaccount_perpetual_positions(
                                                         address = walletaddress,
                                                         subaccount_number = subaccountnumber,
-                                                        status = 'OPEN',
+                                                        status = constants.ORDER_STATUS_OPEN,
                                                         created_before_or_at_height = height
                                                 )
                                                 if len(get_subaccount_perpetual_positions_result.data['positions']) > 0:
@@ -548,6 +588,78 @@ def getpositions4():
                 except Exception as error:
                         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
 
+def checkorder():
+        print('client_id       :', clientid)
+        print('tx_hash         :', place_order_result.tx_hash)
+        print('response        :', place_order_result.response)
+        print('contract_code_id:', place_order_result.contract_code_id)
+        print('contract_address:', place_order_result.contract_address)
+        counter2 = 0
+        while counter2 < 10:
+                try:
+                        if command == 'buyquantity' or command == 'sellquantity' or command == 'buyusdc' or command == 'sellusdc':
+#                               order = findordera()
+                                order = findorder2a()
+                        elif command == 'buyquantitylimit' or command == 'sellquantitylimit':
+#                               order = findorderb()
+                                order = findorder2b()
+                        else:
+                                exit()
+                        print(order)
+                        orderstatus = order['status']
+#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
+                        if orderstatus == constants.ORDER_STATUS_OPEN or orderstatus == constants.ORDER_STATUS_FILLED or orderstatus == constants.ORDER_STATUS_CANCELED or orderstatus == constants.ORDER_STATUS_UNTRIGGERED:
+                                print(orderstatus)
+                                break
+                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
+                        time.sleep(1)
+                except Exception as error:
+                        print('Waiting 1 second for order to be visible.')
+                        time.sleep(1)
+                counter2 += 1
+
+#clientid/dydxmarket/orderexpiration
+def cancelorder():
+        global cancel_order_result
+        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S")+' cancelorder()')
+        try:
+                cancel_order_result = client.cancel_order(
+                        wallet,
+                        client_id = int(clientid),
+                        market = dydxmarket,
+                        order_flags = clients.helpers.chain_helpers.ORDER_FLAGS_LONG_TERM,
+                        good_til_time_in_seconds = orderexpiration,
+                        good_til_block = 0,
+                )
+        except Exception as error:
+                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
+
+def checkcancel():
+        print('client_id       :', clientid)
+        print('tx_hash         :', cancel_order_result.tx_hash)
+        print('response        :', cancel_order_result.response)
+        print('contract_code_id:', cancel_order_result.contract_code_id)
+        print('contract_address:', cancel_order_result.contract_address)
+        counter2 = 0
+        while counter2 < 10:
+                try:
+                        order = findorder2b()
+                        print(order)
+                        orderstatus = order['status']
+#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
+#                       permanent status is also ignored: OPEN, UNTRIGGERED
+                        if orderstatus == constants.ORDER_STATUS_FILLED or orderstatus == constants.ORDER_STATUS_CANCELED:
+                                print(orderstatus)
+                                break
+                        print('Waiting 1 second for order to be FILLED, or CANCELED.')
+                        time.sleep(1)
+                except Exception as error:
+                        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "api query failed (%s)" % error)
+                        break
+                counter2 += 1
+
+global clientid
+global walletaddress
 if len(argv) < 2:
         print('Error: Must specify <apikeyfile>')
         exit()
@@ -558,25 +670,47 @@ else:
         exit()
 if CHAIN_ID == "dydx-testnet-4":
         INDEXERURL = 'https://indexer.v4testnet.dydx.exchange/v4'
+        if sys.platform == "linux" or sys.platform == "linux2":
+                # linux
+                ramdiskpath = '/mnt/ramdisk7'
+        elif sys.platform == "darwin":
+                # OS X
+                ramdiskpath = '/Volumes/RAMDisk7'
 elif CHAIN_ID == "dydx-mainnet-1":
         INDEXERURL = 'https://indexer.dydx.trade/v4'
+        if sys.platform == "linux" or sys.platform == "linux2":
+                # linux
+                ramdiskpath = '/mnt/ramdisk5'
+        elif sys.platform == "darwin":
+                # OS X
+                ramdiskpath = '/Volumes/RAMDisk5'
+else:
+        print(f"Error: CHAIN_ID is not dydx-testnet-4 or dydx-mainnet-1.")
+        exit()
+
 wallet = clients.Subaccount.from_mnemonic(DYDX_TEST_MNEMONIC)
 network = Network.config_network()
 client = clients.CompositeClient(
         network,
 )
+
 if len(argv) > 2:
         command = argv[2]
 else:
         command = 'balance'
+
 if command == 'balance':
 #note: two ways to get balance getbalance() and getbalance2()
         if len(argv) > 3:
-                for walletaddress in argv[3:]:
-#                       getbalance()
-                        getbalance2()
-        else:
+#subaccount specified
                 walletaddress = wallet.address
+                subaccount = argv[3]
+#               getbalance()
+                getbalance2()
+        else:
+#no subaccount specified
+                walletaddress = wallet.address
+                subaccount = 'all'
 #               getbalance()
                 getbalance2()
 elif command == 'positions':
@@ -598,181 +732,137 @@ elif command == 'buyquantity':
                 print('Error: Must specify market, quantity')
                 print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 0.1')
                 exit()
-        ordermarket = argv[3]
+        dydxmarket = argv[3]
         ordersize = float(argv[4])
         orderside = clients.helpers.chain_helpers.OrderSide.BUY
         ordertype = clients.helpers.chain_helpers.OrderType.MARKET
-        dydxmarket = ordermarket
-        if getprices() == None:
-                print('Error: No such market', dydxmarket)
-                exit()
+        if simpleorderbook == 'y':
+                if getprices() == None:
+                        print('Error: No such market', dydxmarket)
+                        exit()
+        else:
+                bestbid = os.popen('cd '+ramdiskpath+'/'+dydxmarket+'/bids; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n | tail -1 | awk \'{print $1}\'').read()[:-1]
+                bestask = os.popen('cd '+ramdiskpath+'/'+dydxmarket+'/asks; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n | head -1 | awk \'{print $1}\'').read()[:-1]
         orderprice = float(bestask) * 2
         orderexpiration = 0
-        ordertif = clients.helpers.chain_helpers.OrderTimeInForce.GTT
+        #should this be GTT or FOK
+        ordertif = clients.helpers.chain_helpers.OrderTimeInForce.FOK
         clientid = randrange(0, 2**31 - 1) #random number between 0 and max(int32) inclusive
-        latest_block = client.validator_client.get.latest_block()
-        good_til_block_value = latest_block.block.header.height + 1 + 10
-        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
+        latest_block_result = client.validator_client.get.latest_block()
+        good_til_block_value = latest_block_result.block.header.height + 1 + 10
+        print(dydxmarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
         sendorder()
-        print('client_id       :', clientid)
-        print('tx_hash         :', place_order_result.tx_hash)
-        print('response        :', place_order_result.response)
-        print('contract_code_id:', place_order_result.contract_code_id)
-        print('contract_address:', place_order_result.contract_address)
         walletaddress = wallet.address
-        counter2=0
-        while counter2 < 10:
-                try:
-#                       order = findordera()
-                        order = findorder2a()
-                        print(order['status'])
-#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
-                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
-                                break
-                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
-                        time.sleep(1)
-                except Exception as error:
-                        print('Waiting 1 second for order to be visible.')
-                        time.sleep(1)
-                counter2 += 1
+        checkorder()
 elif command == 'sellquantity':
         if len(argv) < 5:
                 print('Error: Must specify market, quantity')
                 print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 0.1')
                 exit()
-        ordermarket = argv[3]
+        dydxmarket = argv[3]
         ordersize = float(argv[4])
         orderside = clients.helpers.chain_helpers.OrderSide.SELL
         ordertype = clients.helpers.chain_helpers.OrderType.MARKET
-        dydxmarket = ordermarket
-        if getprices() == None:
-                print('Error: No such market', dydxmarket)
-                exit()
-        getticksize()
+        if simpleorderbook == 'y':
+                if getprices() == None:
+                        print('Error: No such market', dydxmarket)
+                        exit()
+                dydxticksize = getticksize()
+                if dydxticksize == None:
+                        print('Error: No such market', dydxmarket)
+                        exit()
+        else:
+                bestbid = os.popen('cd '+ramdiskpath+'/'+dydxmarket+'/bids; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n | tail -1 | awk \'{print $1}\'').read()[:-1]
+                bestask = os.popen('cd '+ramdiskpath+'/'+dydxmarket+'/asks; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n | head -1 | awk \'{print $1}\'').read()[:-1]
+                dydxticksize = os.popen("tail -1 "+ramdiskpath+"/v4dydxmarketdata/"+dydxmarket+"/tickSize").read()[:-1]
         orderprice = float(bestbid) / 2
         orderprice = float('%g'%(orderprice - (orderprice % float(dydxticksize))))
         orderexpiration = 0
-        ordertif = clients.helpers.chain_helpers.OrderTimeInForce.IOC
+        #should be IOC or FOK
+        ordertif = clients.helpers.chain_helpers.OrderTimeInForce.FOK
         clientid = randrange(0, 999999999) #random number between 0 and 999,999,999 inclusive
-        latest_block = client.validator_client.get.latest_block()
-        good_til_block_value = latest_block.block.header.height + 1 + 10
-        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
+        latest_block_result = client.validator_client.get.latest_block()
+        good_til_block_value = latest_block_result.block.header.height + 1 + 10
+        print(dydxmarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
         sendorder()
-        print('client_id       :', clientid)
-        print('tx_hash         :', place_order_result.tx_hash)
-        print('response        :', place_order_result.response)
-        print('contract_code_id:', place_order_result.contract_code_id)
-        print('contract_address:', place_order_result.contract_address)
         walletaddress = wallet.address
-        counter2=0
-        while counter2 < 10:
-                try:
-#                       order = findordera()
-                        order = findorder2a()
-                        print(order['status'])
-#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
-                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
-                                break
-                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
-                        time.sleep(1)
-                except Exception as error:
-                        print('Waiting 1 second for order to be visible.')
-                        time.sleep(1)
-                counter2 += 1
+        checkorder()
 elif command == 'buyusdc':
         if len(argv) < 5:
                 print('Error: Must specify market, USDCquantity')
                 print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 1000')
                 exit()
-        ordermarket = argv[3]
+        dydxmarket = argv[3]
         usdcsize = argv[4]
         orderside = clients.helpers.chain_helpers.OrderSide.BUY
         ordertype = clients.helpers.chain_helpers.OrderType.MARKET
-        dydxmarket = ordermarket
-        if getprices() == None:
-                print('Error: No such market', dydxmarket)
-                exit()
-        getstepsize()
+        if simpleorderbook == 'y':
+                if getprices() == None:
+                        print('Error: No such market', dydxmarket)
+                        exit()
+                dydxstepsize = getstepsize()
+                if dydxstepsize == None:
+                        print('Error: No such market', dydxmarket)
+                        exit()
+        else:
+                bestbid = os.popen('cd '+ramdiskpath+'/'+dydxmarket+'/bids; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n | tail -1 | awk \'{print $1}\'').read()[:-1]
+                bestask = os.popen('cd '+ramdiskpath+'/'+dydxmarket+'/asks; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n | head -1 | awk \'{print $1}\'').read()[:-1]
+                dydxstepsize = os.popen("tail -1 "+ramdiskpath+"/v4dydxmarketdata/"+dydxmarket+"/stepSize").read()[:-1]
         dydxquantity = float(usdcsize) / float(bestbid)
         dydxquantity = float('%g'%(dydxquantity - (dydxquantity % float(dydxstepsize))))
         ordersize = dydxquantity
         orderprice = float(bestask) * 2
         orderexpiration = 0
-        ordertif = clients.helpers.chain_helpers.OrderTimeInForce.IOC
+        #should be IOC or FOK
+        ordertif = clients.helpers.chain_helpers.OrderTimeInForce.FOK
         clientid = randrange(0, 999999999) #random number between 0 and 999,999,999 inclusive
-        latest_block = client.validator_client.get.latest_block()
-        good_til_block_value = latest_block.block.header.height + 1 + 10
-        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
+        latest_block_result = client.validator_client.get.latest_block()
+        good_til_block_value = latest_block_result.block.header.height + 1 + 10
+        print(dydxmarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
         sendorder()
-        print('client_id       :', clientid)
-        print('tx_hash         :', place_order_result.tx_hash)
-        print('response        :', place_order_result.response)
-        print('contract_code_id:', place_order_result.contract_code_id)
-        print('contract_address:', place_order_result.contract_address)
         walletaddress = wallet.address
-        counter2=0
-        while counter2 < 10:
-                try:
-#                       order = findordera()
-                        order = findorder2a()
-                        print(order['status'])
-#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
-                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
-                                break
-                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
-                        time.sleep(1)
-                except Exception as error:
-                        print('Waiting 1 second for order to be visible.')
-                        time.sleep(1)
-                counter2 += 1
+        checkorder()
 elif command == 'sellusdc':
         if len(argv) < 5:
                 print('Error: Must specify market, USDCquantity')
                 print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 1000')
                 exit()
-        ordermarket = argv[3]
+        dydxmarket = argv[3]
         usdcsize = argv[4]
         orderside = clients.helpers.chain_helpers.OrderSide.SELL
         ordertype = clients.helpers.chain_helpers.OrderType.MARKET
-        dydxmarket = ordermarket
-        if getprices() == None:
-                print('Error: No such market', dydxmarket)
-                exit()
-        getticksize()
-        getstepsize()
+        if simpleorderbook == 'y':
+                if getprices() == None:
+                        print('Error: No such market', dydxmarket)
+                        exit()
+                dydxticksize = getticksize()
+                if dydxticksize == None:
+                        print('Error: No such market', dydxmarket)
+                        exit()
+                dydxstepsize = getstepsize()
+                if dydxstepsize == None:
+                        print('Error: No such market', dydxmarket)
+                        exit()
+        else:
+                bestbid = os.popen('cd '+ramdiskpath+'/'+dydxmarket+'/bids; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n | tail -1 | awk \'{print $1}\'').read()[:-1]
+                bestask = os.popen('cd '+ramdiskpath+'/'+dydxmarket+'/asks; grep "" /dev/null * 2>> /dev/null | sed \'s/:/ /\' | sort -n | head -1 | awk \'{print $1}\'').read()[:-1]
+                dydxticksize = os.popen("tail -1 "+ramdiskpath+"/v4dydxmarketdata/"+dydxmarket+"/tickSize").read()[:-1]
+                dydxstepsize = os.popen("tail -1 "+ramdiskpath+"/v4dydxmarketdata/"+dydxmarket+"/stepSize").read()[:-1]
         dydxquantity = float(usdcsize) / float(bestbid)
         dydxquantity = float('%g'%(dydxquantity - (dydxquantity % float(dydxstepsize))))
         ordersize = dydxquantity
         orderprice = float(bestbid) / 2
         orderprice = float('%g'%(orderprice - (orderprice % float(dydxticksize))))
         orderexpiration = 0
-        ordertif = clients.helpers.chain_helpers.OrderTimeInForce.IOC
+        #should be IOC or FOK
+        ordertif = clients.helpers.chain_helpers.OrderTimeInForce.FOK
         clientid = randrange(0, 999999999) #random number between 0 and 999,999,999 inclusive
-        latest_block = client.validator_client.get.latest_block()
-        good_til_block_value = latest_block.block.header.height + 1 + 10
-        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
+        latest_block_result = client.validator_client.get.latest_block()
+        good_til_block_value = latest_block_result.block.header.height + 1 + 10
+        print(dydxmarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
         sendorder()
-        print('client_id       :', clientid)
-        print('tx_hash         :', place_order_result.tx_hash)
-        print('response        :', place_order_result.response)
-        print('contract_code_id:', place_order_result.contract_code_id)
-        print('contract_address:', place_order_result.contract_address)
         walletaddress = wallet.address
-        counter2=0
-        while counter2 < 10:
-                try:
-#                       order = findordera()
-                        order = findorder2a()
-                        print(order['status'])
-#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
-                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
-                                break
-                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
-                        time.sleep(1)
-                except Exception as error:
-                        print('Waiting 1 second for order to be visible.')
-                        time.sleep(1)
-                counter2 += 1
+        checkorder()
 elif command == 'getorder':
         if len(argv) < 4:
                 print('Error: Must specify [short-term|long-term|both] clientid')
@@ -796,7 +886,7 @@ elif command == 'getorder':
                 order = findorder2()
         print(order)
 elif command == 'getorderid':
-        if len(argv) < 3:
+        if len(argv) < 4:
                 print('Error: Must specify orderid')
                 exit()
         orderid = argv[3]
@@ -808,84 +898,63 @@ elif command == 'buyquantitylimit':
                 print('Error: Must specify market, quantity, limit, seconds')
                 print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 0.1 4000 6000')
                 exit()
-        ordermarket = argv[3]
+        dydxmarket = argv[3]
         ordersize = float(argv[4])
         orderprice = float(argv[5])
-        orderseconds = int(argv[6])
+        orderexpiration = int(argv[6])
         orderside = clients.helpers.chain_helpers.OrderSide.BUY
         ordertype = clients.helpers.chain_helpers.OrderType.LIMIT
-        dydxmarket = ordermarket
-        if getprices() == None:
-                print('Error: No such market', dydxmarket)
-                exit()
-        orderexpiration = orderseconds
         ordertif = clients.helpers.chain_helpers.OrderTimeInForce.GTT
         clientid = randrange(0, 2**31 - 1) #random number between 0 and max(int32) inclusive
         good_til_block_value = 0
-        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
+        print(dydxmarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
         sendorder()
-        print('client_id       :', clientid)
-        print('tx_hash         :', place_order_result.tx_hash)
-        print('response        :', place_order_result.response)
-        print('contract_code_id:', place_order_result.contract_code_id)
-        print('contract_address:', place_order_result.contract_address)
         walletaddress = wallet.address
-        counter2=0
-        while counter2 < 10:
-                try:
-#                       order = findorderb()
-                        order = findorder2b()
-                        print(order['status'])
-#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
-                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
-                                break
-                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
-                        time.sleep(1)
-                except Exception as error:
-                        print('Waiting 1 second for order to be visible.')
-                        time.sleep(1)
-                counter2 += 1
+        checkorder()
 elif command == 'sellquantitylimit':
         if len(argv) < 7:
                 print('Error: Must specify market, quantity, limit, seconds')
                 print('Example: python3', argv[0], argv[1], argv[2], 'BTC-USD 0.1 400000 6000')
                 exit()
-        ordermarket = argv[3]
+        dydxmarket = argv[3]
         ordersize = float(argv[4])
         orderprice = float(argv[5])
-        orderseconds = int(argv[6])
+        orderexpiration = int(argv[6])
         orderside = clients.helpers.chain_helpers.OrderSide.SELL
         ordertype = clients.helpers.chain_helpers.OrderType.LIMIT
-        dydxmarket = ordermarket
-        if getprices() == None:
-                print('Error: No such market', dydxmarket)
-                exit()
-        orderexpiration = orderseconds
         ordertif = clients.helpers.chain_helpers.OrderTimeInForce.GTT
         clientid = randrange(0, 999999999) #random number between 0 and 999,999,999 inclusive
         good_til_block_value = 0
-        print(ordermarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
+        print(dydxmarket, orderside, ordertype, ordersize, orderprice, orderexpiration, ordertif, clientid, good_til_block_value)
         sendorder()
-        print('client_id       :', clientid)
-        print('tx_hash         :', place_order_result.tx_hash)
-        print('response        :', place_order_result.response)
-        print('contract_code_id:', place_order_result.contract_code_id)
-        print('contract_address:', place_order_result.contract_address)
         walletaddress = wallet.address
-        counter2=0
-        while counter2 < 10:
-                try:
-#                       order = findorderb()
-                        order = findorder2b()
-                        print(order['status'])
-#                       temporary statuses are ignored: BEST_EFFORT_OPENED, BEST_EFFORT_CANCELED
-                        if order['status'] == 'OPEN' or order['status'] == 'FILLED' or order['status'] == 'CANCELED' or order['status'] == 'UNTRIGGERED':
-                                break
-                        print('Waiting 1 second for order to be OPEN, FILLED, CANCELED, or UNTRIGGERED.')
-                        time.sleep(1)
-                except Exception as error:
-                        print('Waiting 1 second for order to be visible.')
-                        time.sleep(1)
-                counter2 += 1
+        checkorder()
+elif command == 'cancelorder':
+        if len(argv) < 4:
+                print('Error: Must specify clientid')
+                print('clientid can also be the status OPEN to cancel all OPEN orders')
+                exit()
+        clientid = argv[3]
+        walletaddress = wallet.address
+        order = findorder2b()
+        orderlist = []
+        if clientid == constants.ORDER_STATUS_OPEN:
+                orderlist = order
+        else:
+                orderlist.append(order)
+        counter = 1
+        for order in orderlist:
+                if len(orderlist) > 1:
+                        print('======================================== [ CANCELING ORDER', counter, 'OUT OF', len(orderlist), ']')
+                        counter += 1
+                clientid = order['clientId']
+                orderstatus = order['status']
+                if orderstatus != 'OPEN':
+                        print('Error: order with clientid', clientid, 'is not OPEN')
+                        break
+                dydxmarket = order['ticker']
+                orderexpiration = int(isoparse(order['goodTilBlockTime']).timestamp() - time.time() + 60)
+                cancelorder()
+                checkcancel()
 else:
-        print('Available commands: balance, positions, buyquantity, sellquantity, buyusdc, sellusdc, getorder, getorderid, buyquantitylimit, sellquantitylimit')
+        print('Available commands: balance, positions, buyquantity, sellquantity, buyusdc, sellusdc, getorder, getorderid, buyquantitylimit, sellquantitylimit, cancelorder')
