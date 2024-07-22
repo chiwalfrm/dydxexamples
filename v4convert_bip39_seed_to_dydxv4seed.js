@@ -12,8 +12,8 @@ const wallet = ethers.Wallet.fromPhrase(mnemonic);
 
 const toSign = {
   "domain": {
-    "name": "dYdX V4",
-    "chainId": 5
+    "name": "dYdX Chain",
+    "chainId": 1
   },
   "primaryType": "dYdX",
   "types": {
